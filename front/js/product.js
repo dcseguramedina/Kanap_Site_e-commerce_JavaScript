@@ -100,6 +100,25 @@ function SaveToLocalStorage() {
     else {
         alert()
     }
+    addProductsToCart ()
+}
+
+//Add the addToCart products to the cart
+function addProductsToCart () {
+    let cartProducts = getFromLocalStorage();
+    console.log(cartProducts);
+    //If the product was already present in the cart (same ID + same color) increment the quantity in the array
+    let foundProduct = cartProducts.find(p => 
+        p.id == cartProducts.productId && 
+        p.quantity == cartProducts.productQuantity);
+    if(foundProduct != undefined) {
+        foundProduct.productQuantity++;
+    }
+    //if the product was not already present in the cart add a new element in the array
+    else {
+        cartProducts.productQuantity = 1;
+        cartProducts.push(productDetails);  
+    }
 }
 
 //Get the addToCart product from the local storage
@@ -111,22 +130,29 @@ function getFromLocalStorage() {
     }
     //If there is a product return the product details
     else {
-        return JSON.parse(productDetails);
+        return JSON.parse(cart);
     }
 }
 
-//Add the selected products to cart
-function addProductsToCart () {
-    let cart = getFromLocalStorage();
-    //If the product was already present in the cart (same ID + same color) increment the quantity in the array
-    let foundProduct = cart.find(p => p.id == productDetails.productId && p.quantity == productDetails.productQuantity);
+function changeProductQuantity() {
+    let cartProducts = getFromLocalStorage();
+    let foundProduct = cartProducts.find(p => 
+        p.id == cartProducts.productId && 
+        p.quantity == cartProducts.productQuantity);
     if(foundProduct != undefined) {
-        foundProduct.productQuantity++;
+        foundProduct.productQuantity += productQuantity;
     }
-    //if the product was not already present in the cart add a new element in the array
-    else {
-        productDetails.productQuantity = 1;
-        cart.push(productDetails);
-    }    
     SaveToLocalStorage();
 }
+
+function removeProductsFromCart() {
+    let cartProducts = getFromLocalStorage();
+    cartProducts = cartProducts.filter(p =>
+        p.id != cartProducts.productId);
+    SaveToLocalStorage();
+}
+
+
+
+
+
