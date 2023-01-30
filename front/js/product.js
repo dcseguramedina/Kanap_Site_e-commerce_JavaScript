@@ -1,9 +1,11 @@
-//Get the id of the product to display
+//Get the id of the product to display//
 const str = window.location.href;
 const url = new URL(str);
 let productId = url.searchParams.get("id");
+let productColor;
+let productQuantity;
 
-//Insert a product and its details into the product page
+//Insert a product and its details into the product page//
 fetch('http://localhost:3000/api/products/' + productId)
     .then(function (response) {
         //Check the URL and retrieve the response in the json format
@@ -12,7 +14,6 @@ fetch('http://localhost:3000/api/products/' + productId)
         }
     })
     .then(function (product) {
-
         //Recover the DOM element that will host the product image 
         const sectionItemImage = document.getElementsByClassName("item__img")[0];
 
@@ -20,20 +21,24 @@ fetch('http://localhost:3000/api/products/' + productId)
         const imageElement = document.createElement("img");
         imageElement.src = product.imageUrl;
         imageElement.alt = product.altTxt;
+        let productImage = product.imageUrl;
         //Attach the product image to the image section 
         sectionItemImage.appendChild(imageElement);
 
         //Recover the DOM element that will host the product title and set the content
         const sectionItemTitle = document.getElementById("title");
         sectionItemTitle.textContent = product.name;
+        let productName = product.name;
 
         //Recover the DOM element that will host the product price and set the content
         const sectionItemPrice = document.getElementById("price");
         sectionItemPrice.textContent = product.price;
+        let productPrice = product.price;
 
         //Recover the DOM element that will host the product description and set the content 
         const sectionItemDescription = document.getElementById("description");
         sectionItemDescription.textContent = product.description;
+        let productDescritpion = product.description;
 
         //Set the color options for the product
         for (let color of product.colors) {
@@ -48,111 +53,101 @@ fetch('http://localhost:3000/api/products/' + productId)
             selectColor.appendChild(colorElement);
         }
 
+        //Get updated inputs once the color and quatitt of selected product
+
+        //Recover the DOM elements that contain the color and the quantity of the product
+        const quantityInput = document.getElementById("quantity");
+        const colorSelect = document.getElementById("colors");
+
+        //Listen to the changes on the inputs and retrieve the values
+        colorSelect.addEventListener("change", function (event) {
+            event.preventDefault();
+            productColor = colorSelect.value;
+            console.log(productColor);
+        })
+        quantityInput.addEventListener("change", function (event) {
+            event.preventDefault();
+            productQuantity = quantityInput.value;
+            console.log(productQuantity);
+        })
+
+        addProductToCart()
     })
     .catch(function (error) {
         //Block of code to handle errors
         return error;
     })
 
-//Add products to cart
+//Add product to cart and confirm//
 
-//Create variables to retrieve input values
-let productColor = "";
-let productQuantity = "";
+function addProductToCart() {
+    //Recover the DOM element containing the "addToCart" button
+    const addToCart = document.getElementById("addToCart");
 
-//Recover the DOM elements that contain the color and the quantity of the product
-const quantityInput = document.getElementById("quantity");
-const colorSelect = document.getElementById("colors");
+    //Listen to the click on the "addToCart" button 
+    addToCart.addEventListener("click", function (event) {
+        event.preventDefault();
+        //If the cart already has at least 1 item
+        //Check if the selected quantity is between 1 and 100
+        if (productQuantity > 0 && productQuantity <= 100 && productColor) {
+            console.log("quantity:" + productQuantity);
+            console.log("color:" + productColor);
 
-//Listen to the changes on the inputs and retrieve the values
-colorSelect.addEventListener("change", function (event) {
-    event.preventDefault();
-    productColor = colorSelect.value;
-    console.log(productColor);
-})
-
-quantityInput.addEventListener("change", function (event) {
-    event.preventDefault();
-    productQuantity = quantityInput.value;
-    console.log(productQuantity);
-})
-
-//Listen to the click on the "addToCart" button 
-const addToCart = document.getElementById("addToCart");
-addToCart.addEventListener("click", function (event) {
-    event.preventDefault();
-    SaveToLocalStorage();
-})
-
-//Save the addToCart product into the local storage     
-function SaveToLocalStorage() {
-    if (productQuantity > 0 && productQuantity <= 100 && productQuantity != 0) {
-        //Set the details of the added product  
-        let productDetails = {
-            productId: productId,
-            productColor: productColor,
-            productQuantity: productQuantity
+            //If a cart already exists in the local storage
+            if (localStorage.getItem("cart")) {
+                let cart = JSON.parse(localStorage.getItem("cart"));
+                console.log(cart);
+                //Check if there selected product is already in the cart (same ID + same color)
+                let foundProduct = cart.find(
+                    (p) => p.id == productId && p.color == productColor
+                );
+                console.log(foundProduct);
+                //If the selected product is already in the cart, increment the quantity
+                if (foundProduct != undefined) {                    
+                    foundProduct.productQuantity += productQuantity;
+                    localStorage.setItem("cart", JSON.stringify(cart));
+                    console.log(cart);
+                    addedProductToCartConfirmation();
+                }
+                //if the selected product is not in the cart, add a new product
+                else {
+                    let newProduct = {
+                        productId: productId,
+                        productColor: productColor,
+                        productQuantity: productQuantity
+                    }
+                    cart.push(newProduct);
+                    console.log(newProduct);
+                    localStorage.setItem("cart", JSON.stringify(cart));
+                    console.log(cart);
+                    addedProductToCartConfirmation();
+                }
+            }
+            //If the cart is empty, add a new product
+            else {
+                let cart = [];
+                let newProduct = {
+                    productId: productId,
+                    productColor: productColor,
+                    productQuantity: productQuantity
+                }
+                cart.push(newProduct);
+                console.log(newProduct);
+                localStorage.setItem("cart", JSON.stringify(cart));
+                console.log(cart);
+                addedProductToCartConfirmation();
+            }
         }
-        //Initialize the local storage in order to stock the details of the added product 
-        localStorage.setItem("saveCart", JSON.stringify(productDetails));
-        console.log(productDetails);
-    }
-    else {
-        alert()
-    }
-    addProductsToCart ()
-}
+        else {
+            alert(`Veuillez sélectionner une couleur et une quantité afin de continuer`);
+            console.log(alert);
+        }
+    })
 
-//Add the addToCart products to the cart
-function addProductsToCart () {
-    let cartProducts = getFromLocalStorage();
-    console.log(cartProducts);
-    //If the product was already present in the cart (same ID + same color) increment the quantity in the array
-    let foundProduct = cartProducts.find(p => 
-        p.id == cartProducts.productId && 
-        p.quantity == cartProducts.productQuantity);
-    if(foundProduct != undefined) {
-        foundProduct.productQuantity++;
-    }
-    //if the product was not already present in the cart add a new element in the array
-    else {
-        cartProducts.productQuantity = 1;
-        cartProducts.push(productDetails);  
+    //Added products to cart confirmation
+    function addedProductToCartConfirmation() {
+        if (window.confirm(`Le produit a été ajoutée au panier. Pour consulter votre panier, cliquez sur OK`)) {
+            window.location.href = "cart.html";
+        }
     }
 }
-
-//Get the addToCart product from the local storage
-function getFromLocalStorage() {
-    let cart = localStorage.getItem("saveCart");
-    //If the is no product return an empty array
-    if (cart == null) {
-        return [];
-    }
-    //If there is a product return the product details
-    else {
-        return JSON.parse(cart);
-    }
-}
-
-function changeProductQuantity() {
-    let cartProducts = getFromLocalStorage();
-    let foundProduct = cartProducts.find(p => 
-        p.id == cartProducts.productId && 
-        p.quantity == cartProducts.productQuantity);
-    if(foundProduct != undefined) {
-        foundProduct.productQuantity += productQuantity;
-    }
-    SaveToLocalStorage();
-}
-
-function removeProductsFromCart() {
-    let cartProducts = getFromLocalStorage();
-    cartProducts = cartProducts.filter(p =>
-        p.id != cartProducts.productId);
-    SaveToLocalStorage();
-}
-
-
-
-
-
