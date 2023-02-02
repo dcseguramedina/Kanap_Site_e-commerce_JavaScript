@@ -42,7 +42,6 @@ fetch('http://localhost:3000/api/products/' + productId)
 
         //Set the color options for the product
         for (let color of product.colors) {
-
             //Recover the DOM element that will host the "option" tag
             const selectColor = document.getElementById("colors");
             //Create an "option" tag for the color option
@@ -53,12 +52,11 @@ fetch('http://localhost:3000/api/products/' + productId)
             selectColor.appendChild(colorElement);
         }
 
-        //Get updated inputs once the color and quatitt of selected product
+        //Get updated inputs once the color and quatity of the product qre selected
 
         //Recover the DOM elements that contain the color and the quantity of the product
         const quantityInput = document.getElementById("quantity");
         const colorSelect = document.getElementById("colors");
-
         //Listen to the changes on the inputs and retrieve the values
         colorSelect.addEventListener("change", function (event) {
             event.preventDefault();
@@ -67,10 +65,10 @@ fetch('http://localhost:3000/api/products/' + productId)
         })
         quantityInput.addEventListener("change", function (event) {
             event.preventDefault();
-            productQuantity = quantityInput.value;
+            productQuantity = parseInt(quantityInput.value);
             console.log(productQuantity);
         })
-
+        //Call the function to add the selected products to the cart 
         addProductToCart()
     })
     .catch(function (error) {
@@ -79,7 +77,6 @@ fetch('http://localhost:3000/api/products/' + productId)
     })
 
 //Add product to cart and confirm//
-
 function addProductToCart() {
     //Recover the DOM element containing the "addToCart" button
     const addToCart = document.getElementById("addToCart");
@@ -88,7 +85,7 @@ function addProductToCart() {
     addToCart.addEventListener("click", function (event) {
         event.preventDefault();
         //If the cart already has at least 1 item
-        //Check if the selected quantity is between 1 and 100
+        //Check if the selected quantity is between 1 and 100 units
         if (productQuantity > 0 && productQuantity <= 100 && productColor) {
             console.log("quantity:" + productQuantity);
             console.log("color:" + productColor);
@@ -99,15 +96,21 @@ function addProductToCart() {
                 console.log(cart);
                 //Check if there selected product is already in the cart (same ID + same color)
                 let foundProduct = cart.find(
-                    (p) => p.id == productId && p.color == productColor
+                    (p) => p.productId == productId && p.productColor == productColor
                 );
                 console.log(foundProduct);
                 //If the selected product is already in the cart, increment the quantity
-                if (foundProduct != undefined) {                    
+                if (foundProduct !== undefined) {                    
                     foundProduct.productQuantity += productQuantity;
-                    localStorage.setItem("cart", JSON.stringify(cart));
-                    console.log(cart);
-                    addedProductToCartConfirmation();
+                    if (foundProduct.productQuantity > 100) {
+                        alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
+                        console.log(alert);
+                    }
+                    else {
+                        localStorage.setItem("cart", JSON.stringify(cart));
+                        console.log(cart);
+                        addedProductToCartConfirmation();
+                    }                    
                 }
                 //if the selected product is not in the cart, add a new product
                 else {
@@ -138,6 +141,12 @@ function addProductToCart() {
                 addedProductToCartConfirmation();
             }
         }
+        //If the selected quantity exceeds 100 units
+        else if (productColor && productQuantity > 100 ) {
+            alert(`La quantité maximale est de 100 unités`);
+            console.log(alert);
+        }
+        //If the color and quantity have not been selected
         else {
             alert(`Veuillez sélectionner une couleur et une quantité afin de continuer`);
             console.log(alert);
