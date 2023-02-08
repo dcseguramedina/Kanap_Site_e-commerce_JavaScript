@@ -209,31 +209,3 @@ function modifyProductQuantity() {
 }
 
 modifyProductQuantity();
-
-//Form validation
-
-const form = document.getElementsByClassName("cart__order__form")[0];
-
-const firstNameRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/,"gm");
-const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
-
-const lastNameRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
-const addressRegex = new RegExp(/^[a-zA-Z0-9.,-_ ]{1,100}$/);
-const cityRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
-const emailRegex = new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/,"gm");
-
-
-form.firstName.addEventListener("change", function (event) {
-    event.preventDefault();
-    validFirstName(this);
-})
-
-function validFirstName(firstName) {        
-
-    if (firstNameRegex.test(firstName)) {
-        console.log(firstName);
-    }
-    else {        
-        firstNameErrorMsg.textContent = `Prénom invalide`;
-    }
-}
