@@ -342,3 +342,37 @@ order.addEventListener("click", function (event) {
         sendToServer();
     }
 })
+
+function sendToServer() {
+    const fetchOptions = {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderProducts, orderContact),
+    }
+
+    fetch('http://localhost:3000/api/products/order', fetchOptions)
+        .then(function (response) {
+            //Check the URL and retrieve the response in the json format
+            if (response.ok) {
+                return response.json();
+            }
+        })
+        .then(function (data) {
+            console.log(data);
+            localStorage.clear();
+            localStorage.setItem("orderId", data.orderId);
+            orderConfirmation();
+        })
+        .catch(function (error) {
+            //Block of code to handle errors
+            return error;
+        })
+
+    function orderConfirmation() {
+        if (window.confirm(`La commande a été enregistré. Pour consulter le numéro de commande, cliquez sur OK`)) {
+            window.location.href = "confirmation.html";
+        }
+    };
+}
