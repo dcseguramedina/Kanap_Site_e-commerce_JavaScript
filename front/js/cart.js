@@ -1,11 +1,9 @@
 //From the Cart page, retrieve the cart (the array) via localStorage
 
-let product;
-let productId;
-let productColor;
-let productQuantity;
+
 
 function getCartFromLocalStorage() {
+
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
         console.log(cart);
@@ -94,7 +92,7 @@ function getCartFromLocalStorage() {
             deleteItem.className = "deleteItem";
             deleteItem.textContent = "Supprimer";
             cartItemContentSettingsDelete.appendChild(deleteItem);
-           
+
             //Recover the DOM element that contain the quantity settings and insert the quantity
             let totalQuantity = getTotalQuantity();
             const totalQuantityInput = document.getElementById("totalQuantity");
@@ -141,28 +139,31 @@ function removeProductFromCart() {
     //Recover the DOM element containing the "deleteItem" button
     const removeFromCart = document.querySelectorAll(".deleteItem");
 
-    for (let r = 0; r < removeFromCart.length; r++) {
+    for (let i = 0; i < removeFromCart.length; i++) {
 
         //Listen to the click on the "deleteItem" button 
-        removeFromCart[r].addEventListener("click", function (event) {
+        removeFromCart[i].addEventListener("click", function (event) {
             event.preventDefault();
+            console.log("test");
             if (localStorage.getItem("cart")) {
-                let cart = JSON.parse(localStorage.getItem("cart"));
-                //Look for the selected product (same ID + same color) and keep everything different from it 
-                let filteredProduct = cart.filter(
-                    (p) => p.productId !== productId && p.productColor !== productColor
-                );
-                localStorage.setItem("cart", JSON.stringify(cart));
-                //removeProductFromCartConfirmation();
-            }            
-        })
-
-        //Remove products from cart confirmation
-        function removeProductFromCartConfirmation() {
-            if (window.confirm(`Le produit a été supprimer du panier. Pour consulter votre panier, cliquez sur OK`)) {
-                window.location.reload();
+                if (window.confirm(`Le produit va être supprimé du panier. Cliquez sur OK pour confirmer`)) {
+                    let cart = JSON.parse(localStorage.getItem("cart"));
+                    console.log(cart);
+                    //Look for the selected product (same ID + same color) and keep everything different from it 
+                    cart = cart.filter(
+                        (p) => p.productId !== cart[i].productId || p.productColor !== cart[i].productColor
+                    );
+                    //console.log(filteredProduct)
+                    console.log(cart)
+                    localStorage.setItem("cart", JSON.stringify(cart));
+                    alert("Le produit a été supprimer")
+                    window.location.reload();
+                }
+                else {
+                    alert("Le produit n'a pas été supprimé")
+                }
             }
-        }
+        })
     }
 }
 
@@ -172,40 +173,172 @@ function modifyProductQuantity() {
     //Recover the DOM element that contain the quantity settings
     const modifyQuantity = document.querySelectorAll(".itemQuantity");
 
-    for (let m = 0; m < modifyQuantity.length; m++) {
+    for (let i = 0; i < modifyQuantity.length; i++) {
 
         //Listen to the changes on the quantity inputs 
-        modifyQuantity[m].addEventListener("change", function (event) {
+        modifyQuantity[i].addEventListener("change", function (event) {
             event.preventDefault();
             if (localStorage.getItem("cart")) {
                 let cart = JSON.parse(localStorage.getItem("cart"));
                 //Look for the selected product in the cart (same ID + same color)
                 let foundProduct = cart.find(
-                    (p) => p.productId == productId && p.productColor == productColor
+                    (p) => p.productId == cart[i].productId && p.productColor == cart[i].productColor
                 );
                 //Increment the quantity of the product
                 if (foundProduct !== undefined) {
-                    foundProduct.productQuantity += productQuantity;
-                    if (foundProduct.productQuantity > 100) {
+                    if (modifyQuantity[i].value > 100) {
                         alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
-                    }
-                    else if (foundProduct.productQuantity <= 0) {
-                        removeProductFromCart(foundProduct);
+                        modifyQuantity[i].value = foundProduct.productQuantity
                     }
                     else {
+                        foundProduct.productQuantity = modifyQuantity[i].value;
                         localStorage.setItem("cart", JSON.stringify(cart));
-                        //modifyProductQuantityConfirmation();
+                        alert(`La quantité du produit a été modifié`);
                     }
                 }
             }
         })
-
-        function modifyProductQuantityConfirmation() {
-            if (window.confirm(`La quantité du produit a été modifié. Pour consulter votre panier, cliquez sur OK`)) {
-                window.location.reload();
-            }
-        }
     }
 }
 
 modifyProductQuantity();
+
+//Cart order form validation//
+
+
+
+//Validate the data entered by the user in the form and display an error message if needed
+
+
+//***First name validation
+const firstName = document.getElementById("firstName");
+const firstNameRegex = new RegExp(/^[A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/, "gm");
+const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+
+firstName.addEventListener("change", function (event) {
+    event.preventDefault();
+    validFirstName();
+})
+
+function validFirstName() {
+    if (!firstNameRegex.test(firstName)) {
+        firstNameErrorMsg.textContent = `Prénom invalide`;
+    }
+    else {
+        firstNameErrorMsg.textContent = "";
+    }
+}
+
+
+//Last name validation
+
+const lastName = document.getElementById("lastName");
+const lastNameRegex = new RegExp(/^[A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/, "gm");
+const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+
+lastName.addEventListener("change", function (event) {
+    event.preventDefault();
+    validLastName();
+})
+
+function validLastName() {
+    if (!lastNameRegex.test(lastName)) {
+        lastNameErrorMsg.textContent = `Nom invalide`;
+    }
+    else {
+        lastNameErrorMsg.textContent = ``;
+    }
+}
+
+//Address validation
+const address = document.getElementById("address");
+const addressRegex = new RegExp(/^[a-zA-Z0-9.,-_ ]{1,100}$/, "gm");
+const addressErrorMsg = document.getElementById("addressErrorMsg");
+
+address.addEventListener("change", function (event) {
+    event.preventDefault();
+    validAddress();
+})
+
+function validAddress() {
+    if (!addressRegex.test(address)) {
+        addressErrorMsg.textContent = `Addres invalide`;
+    }
+    else {
+        addressErrorMsg.textContent = ``;
+    }
+}
+
+//City validation
+const city = document.getElementById("city");
+const cityRegex = new RegExp(/^[A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/, "gm");
+const cityErrorMsg = document.getElementById("cityErrorMsg");
+
+city.addEventListener("change", function (event) {
+    event.preventDefault();
+    validCity();
+})
+
+function validCity() {
+    if (!addressRegex.test(city)) {
+        cityErrorMsg.textContent = `Ville invalide`;
+    }
+    else {
+        cityErrorMsg.textContent = ``;
+    }
+}
+
+//Email validation
+const email = document.getElementById("email");
+const emailRegex = new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/, "gm");
+const emailErrorMsg = document.getElementById("emailErrorMsg");
+
+email.addEventListener("change", function (event) {
+    event.preventDefault();
+    validEmail();
+})
+
+function validEmail() {
+    if (!emailRegex.test(email)) {
+        emailErrorMsg.textContent = `Email invalide`;
+    }
+    else {
+        emailErrorMsg.textContent = ``;
+    }
+}
+
+const order = document.getElementById('order');
+
+let orderProducts = [];
+for (let i = 0; i < localStorage.getItem("cart").length; i++) {
+    orderProducts.push(localStorage.getItem("cart")[i].orderProducts);
+}
+
+let orderContact = {
+    firstName: firstName,
+    lastName: lastName,
+    address: address,
+    city: city,
+    email: email
+};
+
+order.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    if (!localStorage.getItem("cart")) {
+        alert(`Votre panier est vide`);
+    }
+    else if (
+        !firstNameRegex.test(firstName) &&
+        !lastNameRegex.test(lastName) &&
+        !addressRegex.test(address) &&
+        !cityRegex.test(city) &&
+        !emailRegex.test(email)
+    ) {
+        alert(`Le formulaire est incorrect`);
+    }
+    else {
+        localStorage.setItem('order', JSON.stringify(orderProducts, orderContact));
+        sendToServer();
+    }
+})
