@@ -153,7 +153,6 @@ function removeProductFromCart() {
                     cart = cart.filter(
                         (p) => p.productId !== cart[i].productId || p.productColor !== cart[i].productColor
                     );
-                    //console.log(filteredProduct)
                     console.log(cart)
                     localStorage.setItem("cart", JSON.stringify(cart));
                     alert("Le produit a été supprimer")
@@ -205,14 +204,11 @@ modifyProductQuantity();
 
 //Cart order form validation//
 
-
-
 //Validate the data entered by the user in the form and display an error message if needed
-
 
 //***First name validation
 const firstName = document.getElementById("firstName");
-const firstNameRegex = new RegExp(/^[A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/, "gm");
+const firstNameRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
 const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
 
 firstName.addEventListener("change", function (event) {
@@ -231,9 +227,8 @@ function validFirstName() {
 
 
 //Last name validation
-
 const lastName = document.getElementById("lastName");
-const lastNameRegex = new RegExp(/^[A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/, "gm");
+const lastNameRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
 const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
 
 lastName.addEventListener("change", function (event) {
@@ -246,13 +241,13 @@ function validLastName() {
         lastNameErrorMsg.textContent = `Nom invalide`;
     }
     else {
-        lastNameErrorMsg.textContent = ``;
+        lastNameErrorMsg.textContent = "";
     }
 }
 
 //Address validation
 const address = document.getElementById("address");
-const addressRegex = new RegExp(/^[a-zA-Z0-9.,-_ ]{1,100}$/, "gm");
+const addressRegex = new RegExp(/^[a-zA-Z0-9.,-_ ]{5,50}[ ]{0,2}$/);
 const addressErrorMsg = document.getElementById("addressErrorMsg");
 
 address.addEventListener("change", function (event) {
@@ -265,13 +260,13 @@ function validAddress() {
         addressErrorMsg.textContent = `Addres invalide`;
     }
     else {
-        addressErrorMsg.textContent = ``;
+        addressErrorMsg.textContent = "";
     }
 }
 
 //City validation
 const city = document.getElementById("city");
-const cityRegex = new RegExp(/^[A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/, "gm");
+const cityRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
 const cityErrorMsg = document.getElementById("cityErrorMsg");
 
 city.addEventListener("change", function (event) {
@@ -284,13 +279,13 @@ function validCity() {
         cityErrorMsg.textContent = `Ville invalide`;
     }
     else {
-        cityErrorMsg.textContent = ``;
+        cityErrorMsg.textContent = "";
     }
 }
 
 //Email validation
 const email = document.getElementById("email");
-const emailRegex = new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/, "gm");
+const emailRegex = new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/);
 const emailErrorMsg = document.getElementById("emailErrorMsg");
 
 email.addEventListener("change", function (event) {
@@ -303,17 +298,22 @@ function validEmail() {
         emailErrorMsg.textContent = `Email invalide`;
     }
     else {
-        emailErrorMsg.textContent = ``;
+        emailErrorMsg.textContent = "";
     }
 }
 
+
+
+//Recover the DOM element that contain the order form
 const order = document.getElementById('order');
 
+//Create a contact object (from the form data)
 let orderProducts = [];
 for (let i = 0; i < localStorage.getItem("cart").length; i++) {
     orderProducts.push(localStorage.getItem("cart")[i].orderProducts);
 }
 
+//Create a table of products
 let orderContact = {
     firstName: firstName,
     lastName: lastName,
@@ -322,28 +322,34 @@ let orderContact = {
     email: email
 };
 
+//Listen to the click on the order button and start a last verification before sending the request
 order.addEventListener("click", function (event) {
     event.preventDefault();
 
-    if (!localStorage.getItem("cart")) {
+    //If there cart is empty, send an alert
+    if (localStorage.getItem("cart") == null || localStorage.getItem("cart") == []) {
         alert(`Votre panier est vide`);
     }
-    else if (
-        !firstNameRegex.test(firstName) &&
-        !lastNameRegex.test(lastName) &&
-        !addressRegex.test(address) &&
-        !cityRegex.test(city) &&
-        !emailRegex.test(email)
-    ) {
-        alert(`Le formulaire est incorrect`);
-    }
+    //If the form is invalid, send an alert 
+    //else if (
+    //    !firstNameRegex.test(firstName) ||
+    //    !lastNameRegex.test(lastName) ||
+    //    !addressRegex.test(address) ||
+    //    !cityRegex.test(city) ||
+    //    !emailRegex.test(email)
+    //) {
+    //    alert(`Le formulaire est incorrect`);
+    //}
+    //If the verification goes well, save the order details in the local storage 
     else {
         localStorage.setItem('order', JSON.stringify(orderProducts, orderContact));
         sendToServer();
     }
 })
 
+//Make a POST request on the API and retrieve the ID of command in the response
 function sendToServer() {
+    //Define the fetch options for the request
     const fetchOptions = {
         method: 'POST',
         headers: {
@@ -354,25 +360,26 @@ function sendToServer() {
 
     fetch('http://localhost:3000/api/products/order', fetchOptions)
         .then(function (response) {
+            console.log(response);
             //Check the URL and retrieve the response in the json format
             if (response.ok) {
                 return response.json();
             }
         })
-        .then(function (data) {
-            console.log(data);
-            localStorage.clear();
-            localStorage.setItem("orderId", data.orderId);
+        //Redirect the user to the Confirm page, passing the id of command in the URL
+        .then(function (order) {
+            console.log(order);  
+
             orderConfirmation();
+
+            function orderConfirmation() {
+                if (window.confirm(`La commande a été enregistré. Pour consulter le numéro de commande, cliquez sur OK`)) {
+                    window.location.href = `./confirmation.html?id=${order._id}`;
+                }
+            };
         })
         .catch(function (error) {
             //Block of code to handle errors
             return error;
-        })
-
-    function orderConfirmation() {
-        if (window.confirm(`La commande a été enregistré. Pour consulter le numéro de commande, cliquez sur OK`)) {
-            window.location.href = "confirmation.html";
-        }
-    };
+        })    
 }
