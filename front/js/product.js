@@ -126,7 +126,6 @@ function addProductToCart(product) {
                         productImage: product.imageUrl,
                         productAltTxt: product.altTxt,
                         productDescritpion: product.description,
-                        productPrice: product.price,
                         productColor: productColor,
                         productQuantity: productQuantity
                     }
@@ -144,7 +143,6 @@ function addProductToCart(product) {
                     productImage: product.imageUrl,
                     productAltTxt: product.altTxt,
                     productDescritpion: product.description,
-                    productPrice: product.price,
                     productColor: productColor,
                     productQuantity: productQuantity
                 }
