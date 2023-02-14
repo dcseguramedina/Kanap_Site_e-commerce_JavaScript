@@ -105,17 +105,15 @@ const orderBtn = document.getElementById("order");
 orderBtn.addEventListener("click", function (event) {
     event.preventDefault();
 
-    //Create a contact object (from the form data)
+    //Create a table of products
     let orderProducts = [];
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
-
-        for (let product of cart) {
-            orderProducts.push(product.productId)
-        }
+        for (product of cart)
+            orderProducts.push(product.productId);
     }
 
-    //Create a table of products
+    //Create a contact object (from the form data)
     let orderContact = {
         firstName: firstName.value,
         lastName: lastName.value,
@@ -128,6 +126,7 @@ orderBtn.addEventListener("click", function (event) {
         products: orderProducts,
         contact: orderContact
     }
+
     //If there cart is empty, send an alert
     if (localStorage.getItem("cart") == null || localStorage.getItem("cart") == []) {
         alert(`Votre panier est vide`);
@@ -144,13 +143,13 @@ orderBtn.addEventListener("click", function (event) {
     }
     //If the verification goes well, save the order details in the local storage 
     else {
-        localStorage.setItem("order", JSON.stringify(order));
-        sendToServer();
+        //localStorage.setItem("order", JSON.stringify(order));
+        sendOrderToServer(order);
     }
 })
 
 //Make a POST request on the API and retrieve the ID of command in the response
-function sendToServer() {
+function sendOrderToServer(order) {
 
     fetch('http://localhost:3000/api/products/order', {
         //Define the fetch options for the request
@@ -170,16 +169,12 @@ function sendToServer() {
         })
         //Redirect the user to the Confirm page, passing the id of command in the URL
         .then(function (order) {
-            console.log(order);
-            //localStorage.clear();
-            //localStorage.setItem("orderId", order.orderId);
-            orderConfirmation();
-
-            function orderConfirmation() {
-                if (window.confirm(`La commande a été enregistré. Pour consulter le numéro de commande, cliquez sur OK`)) {
-                    window.location.href = `./confirmation.html?id=${order.orderId}`;
-                }
-            };
+            let orderId = order.orderId;
+            console.log(orderId);
+            if (orderId != undefined) {
+                location.href = 'confirmation.html?id=' + orderId;
+            }
+            localStorage.clear();
         })
         .catch(function (error) {
             //Block of code to handle errors

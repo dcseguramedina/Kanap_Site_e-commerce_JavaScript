@@ -50,10 +50,9 @@ function getCartFromLocalStorage() {
             productColor.textContent = product.productColor;
             cartItemContentDescription.appendChild(productColor);
 
-            //Create a "p" tag for the product price
-            let productPriceFromAPI = getProductPriceFromAPI();
+            //Create a "p" tag for the product price            
             const productPrice = document.createElement("p");
-            productPrice.textContent = productPriceFromAPI + "€";
+            productPrice.textContent = product.productPrice + "€";
             cartItemContentDescription.appendChild(productPrice);
 
             //Create a "div" tag to contain the product settings
@@ -122,32 +121,13 @@ function getTotalQuantity() {
     return totalQuantity;
 }
 
-function updateTotalQuantity() {
-    //Update quantity of the product to display after modification
-    const totalQuantityInput = document.getElementById("totalQuantity");
-    totalQuantityInput.textContent = modifyQuantity[i].value;
-}
+//function updateTotalQuantity() {
+//    //Update quantity of the product to display after modification
+//    const totalQuantityInput = document.getElementById("totalQuantity");
+//    totalQuantityInput.textContent = modifyQuantity[i].value;
+//}
 
-function getProductPriceFromAPI(productId) {
-    let productPriceFromAPI = 0;
 
-    fetch('http://localhost:3000/api/products/' + productId)
-
-        .then(function (response) {
-            //Check the URL and retrieve the response in the json format
-            if (response.ok) {
-                return response.json();
-
-            }
-        })
-        .then(function (product) {
-            productPriceFromAPI = product.price;
-        })
-        .catch(function (error) {
-            //Block of code to handle errors
-            return error;
-        })
-}
 
 function getTotalPrice() {
 
@@ -161,11 +141,11 @@ function getTotalPrice() {
     return totalPrice;
 }
 
-function updateTotalPrice() {
-    //Update price of the product to display after modification
-    const totalPriceInput = document.getElementById("totalPrice");
-    totalPriceInput.textContent = cart[i].productQuantity * parseInt(cart[i].productPrice);
-}
+//function updateTotalPrice() {
+//    //Update price of the product to display after modification
+//    const totalPriceInput = document.getElementById("totalPrice");
+//    totalPriceInput.textContent = cart[i].productQuantity * parseInt(cart[i].productPrice);
+//}
 
 
 function modifyProductQuantity() {
@@ -185,19 +165,18 @@ function modifyProductQuantity() {
                 );
                 //Increment the quantity of the product
                 if (foundProduct !== undefined) {
-                    if (modifyQuantity[i].value > 100) {
+                    if (parseInt(modifyQuantity[i].value) > 100) {
                         alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
-                        modifyQuantity[i].value = foundProduct.productQuantity
+                        parseInt(modifyQuantity[i].value) = foundProduct.productQuantity
                     }
                     else {
-                        foundProduct.productQuantity = modifyQuantity[i].value;
+                        foundProduct.productQuantity = parseInt(modifyQuantity[i].value);
 
                         //Save to the LS
                         localStorage.setItem("cart", JSON.stringify(cart));
                         alert(`La quantité du produit a été modifié`);
-
-                        updateTotalQuantity();
-                        updateTotalPrice();
+                        window.location.reload();
+                        
                     }
                 }
             }
