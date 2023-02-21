@@ -1,119 +1,52 @@
-//Cart order form validation//
-//Validate the data entered by the user in the form and display an error message if needed//
-
-//First name validation
-const firstName = document.getElementById("firstName");
-const firstNameRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
-const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
-
-firstName.addEventListener("change", function (event) {
-    event.preventDefault();
-    validFirstName();
-})
-
-function validFirstName() {
-    if (firstNameRegex.test(firstName.value)) {
-        firstNameErrorMsg.textContent = "";
+//Form validation
+function initOrderValidation() {
+    //Validate and place the order//
+    //Create an object containing the form fields
+    const contactForm = {
+        firstName: {
+            docName: document.getElementById("firstName"),
+            regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
+            docErrorMsg: document.getElementById("firstNameErrorMsg"),
+            errorMsg: `Prénom invalide`
+        },
+        lastName: {
+            docName: document.getElementById("lastName"),
+            regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
+            docErrorMsg: document.getElementById("lastNameErrorMsg"),
+            errorMsg: `Nom invalide`
+        },
+        address: {
+            docName: document.getElementById("address"),
+            regex: new RegExp(/^[a-zA-Z0-9.,_\é\è\ê\ë\ï\œ\-\s]{5,50}[ ]{0,2}$/),
+            docErrorMsg: document.getElementById("addressErrorMsg"),
+            errorMsg: `Addresse invalide`
+        },
+        city: {
+            docName: document.getElementById("city"),
+            regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
+            docErrorMsg: document.getElementById("cityErrorMsg"),
+            errorMsg: `Vile invalide`
+        },
+        email: {
+            docName: document.getElementById("email"),
+            regex: new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/),
+            docErrorMsg: document.getElementById("emailErrorMsg"),
+            errorMsg: `Email invalide`
+        }
     }
-    else {
-        firstNameErrorMsg.textContent = `Prénom invalide`;
-    }
-}
 
-//Last name validation
-const lastName = document.getElementById("lastName");
-const lastNameRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
-const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+    addEventsToForm(contactForm);
+    addEventsToOrder(contactForm);
 
-lastName.addEventListener("change", function (event) {
-    event.preventDefault();
-    validLastName();
-})
-
-function validLastName() {
-    if (lastNameRegex.test(lastName.value)) {
-        lastNameErrorMsg.textContent = "";
-    }
-    else {
-        lastNameErrorMsg.textContent = `Nom invalide`;
-    }
-}
-
-//Address validation
-const address = document.getElementById("address");
-const addressRegex = new RegExp(/^[a-zA-Z0-9.,-_\é\è\ê\ë\ï\œ\-\s]{5,50}[ ]{0,2}$/);
-const addressErrorMsg = document.getElementById("addressErrorMsg");
-
-address.addEventListener("change", function (event) {
-    event.preventDefault();
-    validAddress();
-})
-
-function validAddress() {
-    if (addressRegex.test(address.value)) {
-        addressErrorMsg.textContent = "";
-    }
-    else {
-        addressErrorMsg.textContent = `Addres invalide`;
-    }
-}
-
-//City validation
-const city = document.getElementById("city");
-const cityRegex = new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/);
-const cityErrorMsg = document.getElementById("cityErrorMsg");
-
-city.addEventListener("change", function (event) {
-    event.preventDefault();
-    validCity();
-})
-
-function validCity() {
-    if (addressRegex.test(city.value)) {
-        cityErrorMsg.textContent = "";
-    }
-    else {
-        cityErrorMsg.textContent = `Ville invalide`;
-    }
-}
-
-//Email validation
-const email = document.getElementById("email");
-const emailRegex = new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/);
-const emailErrorMsg = document.getElementById("emailErrorMsg");
-
-email.addEventListener("change", function (event) {
-    event.preventDefault();
-    validEmail();
-})
-
-function validEmail() {
-    if (emailRegex.test(email.value)) {
-        emailErrorMsg.textContent = "";
-    }
-    else {
-        emailErrorMsg.textContent = `Email invalide`;
-    }
-}
-
-//Validate the form in order to do the POST request to the API (display an error message if needed)//
-
-//Recover the DOM element that contain the order form
-const orderBtn = document.getElementById("order");
-
-//Listen to the click on the order button and start a last verification before sending the request
-orderBtn.addEventListener("click", function (event) {
-    event.preventDefault();
-
-    //Create a table of products
+    //Request the API to post the order details
+    //Create a table of products to recover the productId of each product added to the cart
     let orderProducts = [];
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
         for (product of cart)
             orderProducts.push(product.productId);
     }
-
-    //Create a contact object (from the form data)
+    // Create a contact object (from the form data)
     let orderContact = {
         firstName: firstName.value,
         lastName: lastName.value,
@@ -121,36 +54,76 @@ orderBtn.addEventListener("click", function (event) {
         city: city.value,
         email: email.value
     };
-
+    //Create an order object containing the list of products IDs and the contact information
     let order = {
         products: orderProducts,
         contact: orderContact
     }
+    
+    //if invalid -> exit
+    //else -> sendOrderToServer(order);
+}
 
+initOrderValidation();
+
+//Browse the form fields and add a "change" eventListener
+function addEventsToForm(contactForm) {
+    for (let field in contactForm) {
+        addEventToField(contactForm[field]);
+    }
+}
+//Listen to the changes in the form fields and check the inputs 
+function addEventToField(field) {
+    field.docName.addEventListener("change", function (event) {
+        event.preventDefault();
+        checkFieldInput(field);
+    })
+}
+//Validate the inputs and display an error message if needed
+function checkFieldInput(field) {
+    let valid = field.regex.test(field.docName.value);
+    if (valid == false) {
+        field.docErrorMsg.textContent = field.errorMsg;
+        return false
+    } else {
+        field.docErrorMsg.textContent = "";
+        return true
+    }
+}
+
+//Start the validation of the order information and add an event
+function addEventsToOrder(contactForm) {
+    //Recover the DOM element that contains the order button
+    const orderBtn = document.getElementById("order");
+    //Listen to the click on the order button and start a last verification before sending the request
+    orderBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        validateCartAndForm(contactForm);
+    })
+}
+//Validate the form in order to do the POST request to the API (display an error message if needed)//
+function validateCartAndForm(contactForm) {
+    // Check each field from the order contact form
+    let valid = true;
+    for (let field in contactForm) {
+        valid = checkFieldInput(contactForm[field]);
+        if (valid == false) {
+            break;
+        }
+    }
     //If there cart is empty, send an alert
     if (localStorage.getItem("cart") == null || localStorage.getItem("cart") == []) {
         alert(`Votre panier est vide`);
-    }
-    //If the form is invalid, send an alert 
-    else if (
-        !firstNameRegex.test(firstName.value) ||
-        !lastNameRegex.test(lastName.value) ||
-        !addressRegex.test(address.value) ||
-        !cityRegex.test(city.value) ||
-        !emailRegex.test(email.value)
-    ) {
+        // If the form is invalid, send an alert
+    } else if (valid != true) {
         alert(`Le formulaire est incorrect`);
-    }
-    //If the verification goes well, save the order details in the local storage 
-    else {
-        //localStorage.setItem("order", JSON.stringify(order));
+        // If the verification goes well, send the POST request 
+    } else {
         sendOrderToServer(order);
     }
-})
-
-//Make a POST request on the API and retrieve the ID of command in the response
+}
+//Make a POST request on the API and retrieve the ID of command in the response//
 function sendOrderToServer(order) {
-
     fetch('http://localhost:3000/api/products/order', {
         //Define the fetch options for the request
         method: 'POST',
@@ -161,14 +134,13 @@ function sendOrderToServer(order) {
         body: JSON.stringify(order),
     })
         .then(function (response) {
-            console.log(response);
             //Check the URL and retrieve the response in the json format
             if (response.ok) {
                 return response.json();
             }
         })
-        //Redirect the user to the Confirm page, passing the id of command in the URL
         .then(function (order) {
+            //Redirect the user to the Confirm page, passing the id of command in the URL
             let orderId = order.orderId;
             console.log(orderId);
             if (orderId != undefined) {
