@@ -45,7 +45,6 @@ function initOrderValidation() {
         let cart = JSON.parse(localStorage.getItem("cart"));
         for (product of cart)
             orderProducts.push(product.productId);
-            console.log(orderProducts);
     }
     // Create a contact object (from the form data)
     let orderContact = {
@@ -54,14 +53,12 @@ function initOrderValidation() {
         address: address.value,
         city: city.value,
         email: email.value
-    };
-    console.log(orderContact);
+    };    
     //Create an order object containing the list of products IDs and the contact information
     let order = {
         products: orderProducts,
         contact: orderContact
     }
-    console.log(order);
 
     addEventsToOrder(contactForm, order);
     
