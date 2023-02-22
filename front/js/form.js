@@ -36,7 +36,7 @@ function initOrderValidation() {
     }
 
     addEventsToForm(contactForm);
-    addEventsToOrder(contactForm);
+    
 
     //Request the API to post the order details
     //Create a table of products to recover the productId of each product added to the cart
@@ -45,6 +45,7 @@ function initOrderValidation() {
         let cart = JSON.parse(localStorage.getItem("cart"));
         for (product of cart)
             orderProducts.push(product.productId);
+            console.log(orderProducts);
     }
     // Create a contact object (from the form data)
     let orderContact = {
@@ -54,11 +55,15 @@ function initOrderValidation() {
         city: city.value,
         email: email.value
     };
+    console.log(orderContact);
     //Create an order object containing the list of products IDs and the contact information
     let order = {
         products: orderProducts,
         contact: orderContact
     }
+    console.log(order);
+
+    addEventsToOrder(contactForm, order);
     
     //if invalid -> exit
     //else -> sendOrderToServer(order);
@@ -92,17 +97,17 @@ function checkFieldInput(field) {
 }
 
 //Start the validation of the order information and add an event
-function addEventsToOrder(contactForm) {
+function addEventsToOrder(contactForm, order) {
     //Recover the DOM element that contains the order button
     const orderBtn = document.getElementById("order");
     //Listen to the click on the order button and start a last verification before sending the request
     orderBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        validateCartAndForm(contactForm);
+        validateCartAndForm(contactForm, order);
     })
 }
 //Validate the form in order to do the POST request to the API (display an error message if needed)//
-function validateCartAndForm(contactForm) {
+function validateCartAndForm(contactForm, order) {
     // Check each field from the order contact form
     let valid = true;
     for (let field in contactForm) {
