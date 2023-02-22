@@ -6,12 +6,27 @@ function initCart() {
         alert(`Votre panier est vide`);
         return
     }
-    displayCartContent(cart);
-    //setProductPrice(cart);
+    console.log(cart);
+
+    let price = getProductPrice();
+    console.log(price);
+
+    displayCartContent(cart, price);
 }
 initCart();
 
-/* function setProductPrice() {
+//Get cart from local storage
+function getCartFromLocalStorage() {
+    let cart = [];
+    if (localStorage.getItem("cart")) {
+        cart = JSON.parse(localStorage.getItem("cart"));
+    }
+    return cart;
+}
+
+function getProductPrice() {
+    let productPrice = [];
+
     fetch('http://localhost:3000/api/products/')
         .then(function (response) {
             //Check the URL and retrieve the response in the json format
@@ -20,46 +35,23 @@ initCart();
             }
         })
         .then(function (products) {
-
             for (let product of products) {
-                if (product._id == productId) {
-                    return product.price
-                }
+                let price = {
+                    productId: product._id,
+                    productPrice: product.price
+                };
+                productPrice.push(price);
             }
-            //Create a "p" tag for the product price            
-            const productPrice = document.createElement("p");
-            productPrice.textContent = getProductPrice(product.productId, productList) + "€";
-            //Attach the price to the product
-            //cartItemContentDescription.appendChild(productPrice);
         })
         .catch(function (error) {
             //Block of code to handle errors
             return error;
         })
-} */
-
-/* function getProductPrice(productId, productList) {
-    for (let product of productList) {
-        if (product._id == productId) {
-            return product.price
-        }
-    }
-
-    return "error";
-} */
-
-//Get cart from local storage
-function getCartFromLocalStorage() {
-    let cart = [];
-    if (localStorage.getItem("cart")) {
-        cart = JSON.parse(localStorage.getItem("cart"));
-    }
-
-    return cart;
+    return productPrice;
 }
 
 //Browse the cart content to display the product details
-function displayCartContent(cart) {
+function displayCartContent(cart, price) {
     for (let product of cart) {
         //Recover the DOM element that will host the cart products 
         const sectionCartItems = document.getElementById("cart__items");
@@ -108,6 +100,12 @@ function displayCartContent(cart) {
         productColor.textContent = product.productColor;
         //Attach the color to the product
         cartItemContentDescription.appendChild(productColor);
+
+        //Create a "p" tag for the product price            
+        const productPrice = document.createElement("p");
+        productPrice.textContent = setProductPrice(product.productId, price) + "€";
+        //Attach the price to the product
+        cartItemContentDescription.appendChild(productPrice);
 
         //Create a "div" tag to contain the product settings
         const cartItemContentSettings = document.createElement("div");
@@ -175,6 +173,14 @@ function displayCartContent(cart) {
     }
 }
 
+function setProductPrice(product, price) {
+    console.log(price);
+    let found = price.find(
+        (p) => p.productId == product.productId
+    )
+    console.log(found);
+}
+
 function getTotalQuantity() {
     let totalQuantity = 0;
     if (localStorage.getItem("cart")) {
@@ -197,7 +203,7 @@ function getTotalPrice() {
     return totalPrice;
 }
 
-function modifyProductQuantity(cart, product, quantityInput) {  
+function modifyProductQuantity(cart, product, quantityInput) {
     //If the new quantity is bigger than 100 units, alert and reset to the initial quantity     
     if (parseInt(quantityInput.value) > 100) {
         alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
