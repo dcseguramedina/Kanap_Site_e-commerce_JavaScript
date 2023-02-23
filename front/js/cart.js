@@ -75,14 +75,28 @@ function displayCartContent(cart) {
         //Attach the color to the product
         cartItemContentDescription.appendChild(productColor);
 
-        //Create a "p" tag for the product price            
+        //Create a "p" tag for the product price   
         const productPrice = document.createElement("p");
-        let productPriceAPI = setProductPrice(product.productId);
-        console.log(productPriceAPI);
-        productPrice.textContent = productPriceAPI + "€";
-
-        //Attach the price to the product
+        fetch('http://localhost:3000/api/products/' + product.productId)
+            .then(function (response) {
+                //Check the URL and retrieve the response in the json format
+                if (response.ok) {
+                    return response.json();
+                }
+            })
+            .then(function (data) {
+                console.log(data)
+                let price = data.price;
+                console.log(price);
+                productPrice.textContent = price + " €";
+                console.log(productPrice.textContent);
+            })
+            .catch(function (error) {
+                //Block of code to handle errors
+                return error;
+            })
         cartItemContentDescription.appendChild(productPrice);
+
 
         //Create a "div" tag to contain the product settings
         const cartItemContentSettings = document.createElement("div");
@@ -150,39 +164,6 @@ function displayCartContent(cart) {
     }
 }
 
-async function setProductPrice(productId) {
-    let response = await fetch('http://localhost:3000/api/products/' + productId);
-    let json = await response.json();
-    console.log(json);
-
-    let price = json.price;
-    console.log(price);
-    return price
-
-}
-
-/*function setProductPrice(productId) {
-    let price = 0;
-    fetch('http://localhost:3000/api/products/')
-        .then(function (response) {
-            //Check the URL and retrieve the response in the json format
-            if (response.ok) {
-                return response.json();
-            }
-        })
-    /*.then(function (result) {
-        console.log(result)
-        price = result.price;
-        console.log(price);                    
-    })
-    .catch(function (error) {
-        //Block of code to handle errors
-        return error;
-    })
-    return price;
-}*/
-
-
 function getTotalQuantity() {
     let totalQuantity = 0;
     if (localStorage.getItem("cart")) {
@@ -199,7 +180,7 @@ function getTotalPrice() {
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
         for (let product of cart) {
-            totalPrice += product.productQuantity * parseInt(product.productPrice);
+            totalPrice += product.productQuantity * parseInt();
         }
     }
     return totalPrice;
