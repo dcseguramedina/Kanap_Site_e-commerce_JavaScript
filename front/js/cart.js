@@ -7,10 +7,7 @@ function initCart() {
         return
     }
 
-    let price = getProductPrice();
-
-    //displayCartContent(cart, price);
-    displayCartContent(cart, price);
+    displayCartContent(cart);
 }
 initCart();
 
@@ -20,37 +17,15 @@ function getCartFromLocalStorage() {
     if (localStorage.getItem("cart")) {
         cart = JSON.parse(localStorage.getItem("cart"));
     }
+    console.log(cart);
     return cart;
 }
 
-function getProductPrice() {
-    let productPrice = [];
 
-     fetch('http://localhost:3000/api/products/')
-        .then(function (response) {
-            //Check the URL and retrieve the response in the json format
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(function (products) {
-            for (let product of products) {
-                let price = {
-                    productId: product._id,
-                    productPrice: product.price
-                };
-                productPrice.push(price);
-            }
-        })
-        .catch(function (error) {
-            //Block of code to handle errors
-            return error;
-        })
-    return productPrice;
-}
 
 //Browse the cart content to display the product details
-function displayCartContent(cart, price) {
+function displayCartContent(cart) {
+
     for (let product of cart) {
         //Recover the DOM element that will host the cart products 
         const sectionCartItems = document.getElementById("cart__items");
@@ -102,8 +77,10 @@ function displayCartContent(cart, price) {
 
         //Create a "p" tag for the product price            
         const productPrice = document.createElement("p");
-        productPrice.textContent = setProductPrice(product, price) + "€";
-        
+        let productPriceAPI = setProductPrice(product.productId);
+        console.log(productPriceAPI);
+        productPrice.textContent = productPriceAPI + "€";
+
         //Attach the price to the product
         cartItemContentDescription.appendChild(productPrice);
 
@@ -173,27 +150,38 @@ function displayCartContent(cart, price) {
     }
 }
 
-function setProductPrice(product, price) {
-    console.log(product);
+async function setProductPrice(productId) {
+    let response = await fetch('http://localhost:3000/api/products/' + productId);
+    let json = await response.json();
+    console.log(json);
+
+    let price = json.price;
     console.log(price);
-    let pPrice = 0;
-    console.log(pPrice);
+    return price
 
-    //let found = price.find(
-    //    (p) => p.productId == product.productId
-    //)
-
-    for(let found of price) {
-        console.log(price);
-        if (found.productId == product.productId) {
-            console.log(product.productId);
-            pPrice = found.productPrice
-            
-        }
-        
-    }
-    
 }
+
+/*function setProductPrice(productId) {
+    let price = 0;
+    fetch('http://localhost:3000/api/products/')
+        .then(function (response) {
+            //Check the URL and retrieve the response in the json format
+            if (response.ok) {
+                return response.json();
+            }
+        })
+    /*.then(function (result) {
+        console.log(result)
+        price = result.price;
+        console.log(price);                    
+    })
+    .catch(function (error) {
+        //Block of code to handle errors
+        return error;
+    })
+    return price;
+}*/
+
 
 function getTotalQuantity() {
     let totalQuantity = 0;
