@@ -6,11 +6,10 @@ function initCart() {
         alert(`Votre panier est vide`);
         return
     }
-    console.log(cart);
 
     let price = getProductPrice();
-    console.log(price);
 
+    //displayCartContent(cart, price);
     displayCartContent(cart, price);
 }
 initCart();
@@ -27,7 +26,7 @@ function getCartFromLocalStorage() {
 function getProductPrice() {
     let productPrice = [];
 
-    fetch('http://localhost:3000/api/products/')
+     fetch('http://localhost:3000/api/products/')
         .then(function (response) {
             //Check the URL and retrieve the response in the json format
             if (response.ok) {
@@ -103,7 +102,8 @@ function displayCartContent(cart, price) {
 
         //Create a "p" tag for the product price            
         const productPrice = document.createElement("p");
-        productPrice.textContent = setProductPrice(product.productId, price) + "€";
+        productPrice.textContent = setProductPrice(product, price) + "€";
+        
         //Attach the price to the product
         cartItemContentDescription.appendChild(productPrice);
 
@@ -174,11 +174,25 @@ function displayCartContent(cart, price) {
 }
 
 function setProductPrice(product, price) {
+    console.log(product);
     console.log(price);
-    let found = price.find(
-        (p) => p.productId == product.productId
-    )
-    console.log(found);
+    let pPrice = 0;
+    console.log(pPrice);
+
+    //let found = price.find(
+    //    (p) => p.productId == product.productId
+    //)
+
+    for(let found of price) {
+        console.log(price);
+        if (found.productId == product.productId) {
+            console.log(product.productId);
+            pPrice = found.productPrice
+            
+        }
+        
+    }
+    
 }
 
 function getTotalQuantity() {
