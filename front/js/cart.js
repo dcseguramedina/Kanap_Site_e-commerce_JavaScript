@@ -77,6 +77,7 @@ function displayCartContent(cart) {
 
         //Create a "p" tag for the product price   
         const productPrice = document.createElement("p");
+        productPrice.className = "itemPrice";
         fetch('http://localhost:3000/api/products/' + product.productId)
             .then(function (response) {
                 //Check the URL and retrieve the response in the json format
@@ -85,18 +86,16 @@ function displayCartContent(cart) {
                 }
             })
             .then(function (data) {
-                console.log(data)
                 let price = data.price;
-                console.log(price);
-                productPrice.textContent = price + " €";
-                console.log(productPrice.textContent);
+                productPrice.textContent = price + " €";                
             })
             .catch(function (error) {
                 //Block of code to handle errors
                 return error;
             })
+        
+        //Attach the "p" to the product 
         cartItemContentDescription.appendChild(productPrice);
-
 
         //Create a "div" tag to contain the product settings
         const cartItemContentSettings = document.createElement("div");
@@ -151,12 +150,13 @@ function displayCartContent(cart) {
         cartItemContentSettingsDelete.appendChild(deleteItem);
 
         //Recover the DOM element that contain the total quantity and insert the quantity
-        let totalQuantity = getTotalQuantity();
+        let totalQuantity = getTotalQuantity(cart);
         const totalQuantityInput = document.getElementById("totalQuantity");
         //Attach the total quantity to the section
         totalQuantityInput.textContent = totalQuantity;
 
         //Recover the DOM element that contain the total price and insert the price
+        
         let totalPrice = getTotalPrice();
         const totalPriceInput = document.getElementById("totalPrice");
         //Attach the total price to the section
@@ -164,7 +164,7 @@ function displayCartContent(cart) {
     }
 }
 
-function getTotalQuantity() {
+function getTotalQuantity(cart) {
     let totalQuantity = 0;
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
@@ -176,11 +176,20 @@ function getTotalQuantity() {
 }
 
 function getTotalPrice() {
+    let productPrice = document.getElementsByClassName("itemPrice");
+    console.log(productPrice);
+    let price = 0;
+    for(let i = 0; i < productPrice.length; i++) {
+        price = productPrice[i].textContent;
+        console.log(price);
+        return price;
+    }   
+
     let totalPrice = 0;
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
         for (let product of cart) {
-            totalPrice += product.productQuantity * parseInt();
+            totalPrice += product.productQuantity * parseInt(price);
         }
     }
     return totalPrice;
