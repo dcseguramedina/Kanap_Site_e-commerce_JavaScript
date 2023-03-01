@@ -1,15 +1,4 @@
 //Retrieve the cart via the local storage and display the cart content//
-function initCart() {
-
-    let cart = getCartFromLocalStorage();
-    if (cart == undefined || cart.length == 0) {
-        alert(`Votre panier est vide`);
-        return
-    }
-
-    displayCartContent(cart);
-}
-initCart();
 
 //Get cart from local storage
 function getCartFromLocalStorage() {
@@ -17,14 +6,16 @@ function getCartFromLocalStorage() {
     if (localStorage.getItem("cart")) {
         cart = JSON.parse(localStorage.getItem("cart"));
     }
-    console.log(cart);
     return cart;
 }
 
-
-
 //Browse the cart content to display the product details
-function displayCartContent(cart) {
+function displayCartContent() {
+
+    let cart = getCartFromLocalStorage();
+    if (cart == undefined || cart.length == 0) {
+        alert(`Votre panier est vide`);
+    }
 
     for (let product of cart) {
         //Recover the DOM element that will host the cart products 
@@ -87,13 +78,13 @@ function displayCartContent(cart) {
             })
             .then(function (data) {
                 let price = data.price;
-                productPrice.textContent = price + " €";                
+                productPrice.textContent = price + " €";
             })
             .catch(function (error) {
                 //Block of code to handle errors
                 return error;
             })
-        
+
         //Attach the "p" to the product 
         cartItemContentDescription.appendChild(productPrice);
 
@@ -156,13 +147,14 @@ function displayCartContent(cart) {
         totalQuantityInput.textContent = totalQuantity;
 
         //Recover the DOM element that contain the total price and insert the price
-        
+
         let totalPrice = getTotalPrice();
         const totalPriceInput = document.getElementById("totalPrice");
         //Attach the total price to the section
         totalPriceInput.textContent = totalPrice;
     }
 }
+displayCartContent();
 
 function getTotalQuantity(cart) {
     let totalQuantity = 0;
@@ -179,11 +171,11 @@ function getTotalPrice() {
     let productPrice = document.getElementsByClassName("itemPrice");
     console.log(productPrice);
     let price = 0;
-    for(let i = 0; i < productPrice.length; i++) {
+    for (let i = 0; i < productPrice.length; i++) {
         price = productPrice[i].textContent;
         console.log(price);
         return price;
-    }   
+    }
 
     let totalPrice = 0;
     if (localStorage.getItem("cart")) {

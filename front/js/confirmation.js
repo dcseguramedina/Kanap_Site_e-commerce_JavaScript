@@ -1,8 +1,4 @@
 //Display orderId - This number must not be kept or stored//
-function initConfirmation() {
-    displayOrderId();
-}
-initConfirmation();
 
 //Get the orderId to display in the confirmation page
 function getOrderIdToDisplay() {
@@ -19,3 +15,4 @@ function displayOrderId() {
     //Display the orderId in the page
     confirmation.textContent = orderId + `. Merci pour votre commande`;
 }  
+displayOrderId();

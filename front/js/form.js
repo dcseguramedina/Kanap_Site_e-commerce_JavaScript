@@ -1,72 +1,38 @@
-//Form validation
-function initOrderValidation() {
-    //Validate and place the order//
-    //Create an object containing the form fields
-    const contactForm = {
-        firstName: {
-            docName: document.getElementById("firstName"),
-            regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
-            docErrorMsg: document.getElementById("firstNameErrorMsg"),
-            errorMsg: `Prénom invalide`
-        },
-        lastName: {
-            docName: document.getElementById("lastName"),
-            regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
-            docErrorMsg: document.getElementById("lastNameErrorMsg"),
-            errorMsg: `Nom invalide`
-        },
-        address: {
-            docName: document.getElementById("address"),
-            regex: new RegExp(/^[a-zA-Z0-9.,_\é\è\ê\ë\ï\œ\-\s]{5,50}[ ]{0,2}$/),
-            docErrorMsg: document.getElementById("addressErrorMsg"),
-            errorMsg: `Addresse invalide`
-        },
-        city: {
-            docName: document.getElementById("city"),
-            regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
-            docErrorMsg: document.getElementById("cityErrorMsg"),
-            errorMsg: `Vile invalide`
-        },
-        email: {
-            docName: document.getElementById("email"),
-            regex: new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/),
-            docErrorMsg: document.getElementById("emailErrorMsg"),
-            errorMsg: `Email invalide`
-        }
-    }
+//Validate and place the order//
 
-    addEventsToForm(contactForm);
-    
-
-    //Request the API to post the order details
-    //Create a table of products to recover the productId of each product added to the cart
-    let orderProducts = [];
-    if (localStorage.getItem("cart")) {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        for (product of cart)
-            orderProducts.push(product.productId);
+//Create an object containing the form fields
+const contactForm = {
+    firstName: {
+        docName: document.getElementById("firstName"),
+        regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
+        docErrorMsg: document.getElementById("firstNameErrorMsg"),
+        errorMsg: `Prénom invalide`
+    },
+    lastName: {
+        docName: document.getElementById("lastName"),
+        regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
+        docErrorMsg: document.getElementById("lastNameErrorMsg"),
+        errorMsg: `Nom invalide`
+    },
+    address: {
+        docName: document.getElementById("address"),
+        regex: new RegExp(/^[a-zA-Z0-9.,_\é\è\ê\ë\ï\œ\-\s]{5,50}[ ]{0,2}$/),
+        docErrorMsg: document.getElementById("addressErrorMsg"),
+        errorMsg: `Addresse invalide`
+    },
+    city: {
+        docName: document.getElementById("city"),
+        regex: new RegExp(/^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/),
+        docErrorMsg: document.getElementById("cityErrorMsg"),
+        errorMsg: `Vile invalide`
+    },
+    email: {
+        docName: document.getElementById("email"),
+        regex: new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+[@]{1}[A-Za-z0-9.-]+$/),
+        docErrorMsg: document.getElementById("emailErrorMsg"),
+        errorMsg: `Email invalide`
     }
-    // Create a contact object (from the form data)
-    let orderContact = {
-        firstName: firstName.value,
-        lastName: lastName.value,
-        address: address.value,
-        city: city.value,
-        email: email.value
-    };    
-    //Create an order object containing the list of products IDs and the contact information
-    let order = {
-        products: orderProducts,
-        contact: orderContact
-    }
-
-    addEventsToOrder(contactForm, order);
-    
-    //if invalid -> exit
-    //else -> sendOrderToServer(order);
 }
-
-initOrderValidation();
 
 //Browse the form fields and add a "change" eventListener
 function addEventsToForm(contactForm) {
@@ -74,6 +40,8 @@ function addEventsToForm(contactForm) {
         addEventToField(contactForm[field]);
     }
 }
+addEventsToForm(contactForm);
+
 //Listen to the changes in the form fields and check the inputs 
 function addEventToField(field) {
     field.docName.addEventListener("change", function (event) {
@@ -93,6 +61,29 @@ function checkFieldInput(field) {
     }
 }
 
+//Request the API to post the order details//
+
+//Create a table of products to recover the productId of each product added to the cart
+let orderProducts = [];
+if (localStorage.getItem("cart")) {
+    let cart = JSON.parse(localStorage.getItem("cart"));
+    for (product of cart)
+        orderProducts.push(product.productId);
+}
+// Create a contact object (from the form data)
+let orderContact = {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    address: address.value,
+    city: city.value,
+    email: email.value
+};
+//Create an order object containing the list of products IDs and the contact information
+let order = {
+    products: orderProducts,
+    contact: orderContact
+}
+
 //Start the validation of the order information and add an event
 function addEventsToOrder(contactForm, order) {
     //Recover the DOM element that contains the order button
@@ -103,6 +94,8 @@ function addEventsToOrder(contactForm, order) {
         validateCartAndForm(contactForm, order);
     })
 }
+addEventsToOrder(contactForm, order);
+
 //Validate the form in order to do the POST request to the API (display an error message if needed)//
 function validateCartAndForm(contactForm, order) {
     // Check each field from the order contact form
@@ -124,6 +117,7 @@ function validateCartAndForm(contactForm, order) {
         sendOrderToServer(order);
     }
 }
+
 //Make a POST request on the API and retrieve the ID of command in the response//
 function sendOrderToServer(order) {
     fetch('http://localhost:3000/api/products/order', {

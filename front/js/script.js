@@ -1,9 +1,4 @@
 //Insert products on the home page//
-function initAccueil() {
-    displaySetOfProducts();
-}
-
-initAccueil();
 
 //Request the API to get the set of products to display
 function displaySetOfProducts() {
@@ -58,3 +53,4 @@ function displaySetOfProducts() {
             return error;
         })
 }
+displaySetOfProducts();

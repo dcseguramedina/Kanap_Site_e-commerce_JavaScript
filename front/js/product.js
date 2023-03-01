@@ -1,10 +1,6 @@
 //Insert a product and its details into the page product and add to the cart//
-function initProduct() {
-    displayProduct();
-}
 
-initProduct();
-
+//Get the Id of the product to display
 function getProductId() {
     const str = window.location.href;
     const url = new URL(str);
@@ -74,6 +70,7 @@ function displayProduct() {
             return error;
         })
 }
+displayProduct();
 
 function setColorOptions(product) {
     for (let color of product.colors) {
