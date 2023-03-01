@@ -120,7 +120,8 @@ function validateCartAndForm(contactForm, order) {
 
 //Make a POST request on the API and retrieve the ID of command in the response//
 function sendOrderToServer(order) {
-    fetch('http://localhost:3000/api/products/order', {
+    const urlOrder = 'http://localhost:3000/api/products/order';
+    fetch(urlOrder, {
         //Define the fetch options for the request
         method: 'POST',
         headers: {
@@ -129,23 +130,18 @@ function sendOrderToServer(order) {
         },
         body: JSON.stringify(order),
     })
-        .then(function (response) {
-            //Check the URL and retrieve the response in the json format
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(function (order) {
-            //Redirect the user to the Confirm page, passing the id of command in the URL
+        //Check the URL and retrieve the response in the json format
+        .then((response) => response.json())
+        //Redirect the user to the confirm page, passing the id of command in the URL
+        .then((order) => {
             let orderId = order.orderId;
-            console.log(orderId);
             if (orderId != undefined) {
                 location.href = 'confirmation.html?id=' + orderId;
             }
             localStorage.clear();
         })
-        .catch(function (error) {
-            //Block of code to handle errors
-            return error;
+        //Block of code to handle errors
+        .catch((error) => {
+            alert(`Une erreur s'est produite. Veuillez réessayer`);
         })
 }

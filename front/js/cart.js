@@ -69,22 +69,20 @@ function displayCartContent() {
         //Create a "p" tag for the product price   
         const productPrice = document.createElement("p");
         productPrice.className = "itemPrice";
-        fetch('http://localhost:3000/api/products/' + product.productId)
-            .then(function (response) {
-                //Check the URL and retrieve the response in the json format
-                if (response.ok) {
-                    return response.json();
-                }
-            })
-            .then(function (data) {
-                let price = data.price;
+
+        const urlPrice = 'http://localhost:3000/api/products/' + product.productId;
+        fetch(urlPrice)
+            //Check the URL and retrieve the response in the json format
+            .then((response) => response.json())
+            .then((product) => {
+                let price = product.price;
                 productPrice.textContent = price + " €";
             })
-            .catch(function (error) {
-                //Block of code to handle errors
-                return error;
+            //Block of code to handle errors
+            .catch((error) => {
+                alert(`Une erreur s'est produite. Veuillez réessayer`);
             })
-
+            
         //Attach the "p" to the product 
         cartItemContentDescription.appendChild(productPrice);
 

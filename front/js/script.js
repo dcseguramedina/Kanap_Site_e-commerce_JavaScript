@@ -1,18 +1,13 @@
 //Insert products on the home page//
-
-//Request the API to get the set of products to display
-function displaySetOfProducts() {
-    fetch('http://localhost:3000/api/products/')
-        .then(function (response) {
-            //Check the URL and retrieve the response in the json format
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(function (products) {
-            //Browse the response to insert each product in the homepage
+function displaySetOfProducts() {   
+    //Request the API to get the set of products to display
+    const url = 'http://localhost:3000/api/products/';
+    fetch(url)
+        //Check the URL and retrieve the response in the json format
+        .then((response) => response.json())
+        //Browse the response data to insert each product in the homepage
+        .then((products) => {
             for (let product of products) {
-
                 //Recover the DOM element that will host the products 
                 const sectionItems = document.getElementById("items");
 
@@ -48,9 +43,9 @@ function displaySetOfProducts() {
                 productElement.appendChild(descriptionElement);
             }
         })
-        .catch(function (error) {
-            //Block of code to handle errors
-            return error;
+        //Block of code to handle errors
+        .catch((error) => {
+            alert(`Une erreur s'est produite. Veuillez réessayer`);
         })
 }
 displaySetOfProducts();

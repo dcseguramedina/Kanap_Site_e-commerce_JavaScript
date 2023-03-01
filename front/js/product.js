@@ -1,26 +1,14 @@
-//Insert a product and its details into the page product and add to the cart//
-
-//Get the Id of the product to display
-function getProductId() {
-    const str = window.location.href;
-    const url = new URL(str);
-    return url.searchParams.get("id")
-}
-
-//Insert the product and its details into the product page
+//Insert the product and its details into the product page//
 function displayProduct() {
-
-    let productId = getProductId();
-
+    //Get the Id of the product to display
+    let productId = new URL(window.location.href).searchParams.get("id");  
     //Request the API to get the product to display
-    fetch('http://localhost:3000/api/products/' + productId)
-        .then(function (response) {
-            //Check the URL and retrieve the response in the json format
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(function (product) {
+    const urlId = 'http://localhost:3000/api/products/' + productId;
+    fetch(urlId)
+        //Check the URL and retrieve the response in the json format
+        .then((response) => response.json())
+        //Insert product details in the page
+        .then((product) => { 
             //Recover the DOM element that will host the product image 
             const sectionItemImage = document.getElementsByClassName("item__img")[0];
 
@@ -65,9 +53,9 @@ function displayProduct() {
             //Listen to the click on the "addToCart" button and check the product details inputs 
             addEventToAddToCart(newProduct);
         })
-        .catch(function (error) {
-            //Block of code to handle errors
-            return error;
+        //Block of code to handle errors
+        .catch((error) => {
+            alert(`Une erreur s'est produite. Veuillez réessayer`);
         })
 }
 displayProduct();
