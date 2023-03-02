@@ -1,5 +1,5 @@
 //Display orderId - This number must not be kept or stored//
-function displayOrderId() {
+let displayOrderId = () => {
     //Get the orderId to display 
     let orderId = new URL(window.location.href).searchParams.get("id");
     //Recover the DOM element containing the orderId

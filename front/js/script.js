@@ -1,5 +1,5 @@
 //Insert products on the home page//
-function displaySetOfProducts() {   
+let displaySetOfProducts = () => {   
     //Request the API to get the set of products to display
     const url = 'http://localhost:3000/api/products/';
     fetch(url)
@@ -7,7 +7,7 @@ function displaySetOfProducts() {
         .then((response) => response.json())
         //Browse the response data to insert each product in the homepage
         .then((products) => {
-            for (let product of products) {
+            for (let product of products) {                
                 //Recover the DOM element that will host the products 
                 const sectionItems = document.getElementById("items");
 
@@ -46,6 +46,6 @@ function displaySetOfProducts() {
         //Block of code to handle errors
         .catch((error) => {
             alert(`Une erreur s'est produite. Veuillez réessayer`);
-        })
+        })        
 }
 displaySetOfProducts();

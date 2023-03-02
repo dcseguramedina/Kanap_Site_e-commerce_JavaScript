@@ -1,22 +1,24 @@
 //Retrieve the cart via the local storage and display the cart content//
 
 //Get cart from local storage
-function getCartFromLocalStorage() {
+let getCartFromLocalStorage = () => {
     let cart = [];
     if (localStorage.getItem("cart")) {
         cart = JSON.parse(localStorage.getItem("cart"));
+        console.log(cart);
     }
-    return cart;
+    return cart
 }
 
-//Browse the cart content to display the product details
-function displayCartContent() {
+let displayCartContent = () => {
 
     let cart = getCartFromLocalStorage();
+
     if (cart == undefined || cart.length == 0) {
         alert(`Votre panier est vide`);
     }
 
+    //Browse the cart content to display the product details
     for (let product of cart) {
         //Recover the DOM element that will host the cart products 
         const sectionCartItems = document.getElementById("cart__items");
@@ -77,12 +79,13 @@ function displayCartContent() {
             .then((product) => {
                 let price = product.price;
                 productPrice.textContent = price + " €";
+                
             })
             //Block of code to handle errors
             .catch((error) => {
                 alert(`Une erreur s'est produite. Veuillez réessayer`);
-            })
-            
+            })       
+
         //Attach the "p" to the product 
         cartItemContentDescription.appendChild(productPrice);
 
@@ -113,7 +116,7 @@ function displayCartContent() {
         quantityInput.setAttribute("max", "100");
         quantityInput.value = product.productQuantity;
         //Listen to the changes on the quantity inputs and retrieve the values 
-        quantityInput.addEventListener("change", function (event) {
+        quantityInput.addEventListener("change", (event) => {
             event.preventDefault();
             modifyProductQuantity(cart, product, quantityInput);
         });
@@ -131,30 +134,27 @@ function displayCartContent() {
         deleteItem.className = "deleteItem";
         deleteItem.textContent = "Supprimer";
         //Listen to the click on the "deleteItem" button and delete the products
-        deleteItem.addEventListener("click", function (event) {
+        deleteItem.addEventListener("click", (event) => {
             event.preventDefault();
             deleteItemFromCart(cart, product);
         });
         //Attach the delete option to the product
         cartItemContentSettingsDelete.appendChild(deleteItem);
 
-        //Recover the DOM element that contain the total quantity and insert the quantity
-        let totalQuantity = getTotalQuantity(cart);
+        //Recover the DOM element that contain the total quantity
         const totalQuantityInput = document.getElementById("totalQuantity");
-        //Attach the total quantity to the section
-        totalQuantityInput.textContent = totalQuantity;
+        //Insert the total quantity to the section
+        totalQuantityInput.textContent = totalQuantity();
 
-        //Recover the DOM element that contain the total price and insert the price
-
-        let totalPrice = getTotalPrice();
+        //Recover the DOM element that contain the total price       
         const totalPriceInput = document.getElementById("totalPrice");
-        //Attach the total price to the section
-        totalPriceInput.textContent = totalPrice;
+        //Insert the total price to the section
+        totalPriceInput.textContent = totalPrice();
     }
 }
 displayCartContent();
 
-function getTotalQuantity(cart) {
+function totalQuantity() {
     let totalQuantity = 0;
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
@@ -165,7 +165,7 @@ function getTotalQuantity(cart) {
     return totalQuantity;
 }
 
-function getTotalPrice() {
+/*function getP() {
     let productPrice = document.getElementsByClassName("itemPrice");
     console.log(productPrice);
     let price = 0;
@@ -174,7 +174,9 @@ function getTotalPrice() {
         console.log(price);
         return price;
     }
+}*/
 
+function totalPrice(price) {
     let totalPrice = 0;
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
@@ -185,7 +187,7 @@ function getTotalPrice() {
     return totalPrice;
 }
 
-function modifyProductQuantity(cart, product, quantityInput) {
+let modifyProductQuantity = (cart, product, quantityInput) => {
     //If the new quantity is bigger than 100 units, alert and reset to the initial quantity     
     if (parseInt(quantityInput.value) > 100) {
         alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
@@ -198,11 +200,12 @@ function modifyProductQuantity(cart, product, quantityInput) {
     window.location.reload();
 }
 
-function deleteItemFromCart(cart, product) {
-    console.log("test");
+let deleteItemFromCart = (cart, product) => {
     if (window.confirm(`Le produit va être supprimé du panier. Cliquez sur OK pour confirmer`)) {
         //Look for the selected product (same ID + same color) and keep everything different from it 
-        cart = filterCartProduct(cart, product);
+        cart = cart.filter(
+            (p) => p.productId !== product.productId || p.productColor !== product.productColor
+        );
         localStorage.setItem("cart", JSON.stringify(cart));
         alert("Le produit a été supprimer")
         window.location.reload();
@@ -210,10 +213,4 @@ function deleteItemFromCart(cart, product) {
     else {
         alert("Le produit n'a pas été supprimé")
     }
-}
-
-function filterCartProduct(cart, product) {
-    return cart.filter(
-        (p) => p.productId !== product.productId || p.productColor !== product.productColor
-    )
 }

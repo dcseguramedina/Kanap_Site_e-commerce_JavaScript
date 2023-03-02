@@ -34,23 +34,24 @@ const contactForm = {
     }
 }
 
-//Browse the form fields and add a "change" eventListener
-function addEventsToForm(contactForm) {
+//Browse the form fields to add en eventListener
+function browseForm(contactForm) {
     for (let field in contactForm) {
         addEventToField(contactForm[field]);
     }
 }
-addEventsToForm(contactForm);
+browseForm(contactForm);
 
 //Listen to the changes in the form fields and check the inputs 
 function addEventToField(field) {
-    field.docName.addEventListener("change", function (event) {
+    field.docName.addEventListener("change", (event) => {
         event.preventDefault();
         checkFieldInput(field);
     })
 }
+
 //Validate the inputs and display an error message if needed
-function checkFieldInput(field) {
+let checkFieldInput = (field) => {
     let valid = field.regex.test(field.docName.value);
     if (valid == false) {
         field.docErrorMsg.textContent = field.errorMsg;
@@ -77,7 +78,7 @@ let orderContact = {
     address: address.value,
     city: city.value,
     email: email.value
-};
+}
 //Create an order object containing the list of products IDs and the contact information
 let order = {
     products: orderProducts,
@@ -89,7 +90,7 @@ function addEventsToOrder(contactForm, order) {
     //Recover the DOM element that contains the order button
     const orderBtn = document.getElementById("order");
     //Listen to the click on the order button and start a last verification before sending the request
-    orderBtn.addEventListener("click", function (event) {
+    orderBtn.addEventListener("click", (event) => {
         event.preventDefault();
         validateCartAndForm(contactForm, order);
     })
@@ -97,7 +98,7 @@ function addEventsToOrder(contactForm, order) {
 addEventsToOrder(contactForm, order);
 
 //Validate the form in order to do the POST request to the API (display an error message if needed)//
-function validateCartAndForm(contactForm, order) {
+let validateCartAndForm = (contactForm, order) => {
     // Check each field from the order contact form
     let valid = true;
     for (let field in contactForm) {
@@ -119,7 +120,7 @@ function validateCartAndForm(contactForm, order) {
 }
 
 //Make a POST request on the API and retrieve the ID of command in the response//
-function sendOrderToServer(order) {
+let sendOrderToServer = (order) => {
     const urlOrder = 'http://localhost:3000/api/products/order';
     fetch(urlOrder, {
         //Define the fetch options for the request

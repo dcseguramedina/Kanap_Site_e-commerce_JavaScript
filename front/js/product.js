@@ -1,14 +1,14 @@
 //Insert the product and its details into the product page//
-function displayProduct() {
+let displayProduct = () => {
     //Get the Id of the product to display
-    let productId = new URL(window.location.href).searchParams.get("id");  
+    let productId = () => new URL(window.location.href).searchParams.get("id");
     //Request the API to get the product to display
-    const urlId = 'http://localhost:3000/api/products/' + productId;
+    const urlId = 'http://localhost:3000/api/products/' + productId();
     fetch(urlId)
         //Check the URL and retrieve the response in the json format
         .then((response) => response.json())
         //Insert product details in the page
-        .then((product) => { 
+        .then((product) => {
             //Recover the DOM element that will host the product image 
             const sectionItemImage = document.getElementsByClassName("item__img")[0];
 
@@ -31,27 +31,46 @@ function displayProduct() {
             const sectionItemDescription = document.getElementById("description");
             sectionItemDescription.textContent = product.description;
 
-            //Set the color options for the product
-            setColorOptions(product);     
-            
-            let newProduct = {
+            //Call the function to set the color options for the product
+            setColorOptions(product);
+
+            //Create a newProduct object containing the details of the selected product
+            const newProduct = {
                 productId: product._id,
                 productImage: product.imageUrl,
                 productAltTxt: product.altTxt,
                 productName: product.name,
                 productDescritpion: product.description,
                 productColor: undefined,
-                productQuantity: undefined
-            }
+                productQuantity: undefined,
+                productPrice: undefined
+            };
 
             //Listen to the changes on the color inputs and retrieve the values
-            addEventToColor(newProduct);
+            //Recover the DOM elements that contain the color of the product
+            const selectColor = document.getElementById("colors");
+            selectColor.addEventListener("change", (event) => {
+                event.preventDefault();
+                newProduct.productColor = selectColor.value;
+            })
 
             //Listen to the changes on the quantity inputs and retrieve the values
-            addEventToQuantity(newProduct);
+            //Recover the DOM elements that contain the quantity of the product
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.addEventListener("change", (event) => {
+                event.preventDefault();
+                newProduct.productQuantity = parseInt(quantityInput.value);
+            })
 
             //Listen to the click on the "addToCart" button and check the product details inputs 
-            addEventToAddToCart(newProduct);
+            //Recover the DOM element containing the "addToCart" button
+            const addToCart = document.getElementById("addToCart");
+            addToCart.addEventListener("click", (event) => {
+                event.preventDefault();
+                if (checkColorAndQuantityInputs(newProduct.productColor, newProduct.productQuantity) == true) {
+                    addProductToCart(newProduct);
+                };
+            })
         })
         //Block of code to handle errors
         .catch((error) => {
@@ -60,7 +79,8 @@ function displayProduct() {
 }
 displayProduct();
 
-function setColorOptions(product) {
+//Set the color options for the product
+let setColorOptions = (product) => {
     for (let color of product.colors) {
         //Recover the DOM element that will host the "option" tag 
         const selectColor = document.getElementById("colors");
@@ -73,37 +93,8 @@ function setColorOptions(product) {
     }
 }
 
-function addEventToColor(newProduct) {
-    //Recover the DOM elements that contain the color of the product
-    const selectColor = document.getElementById("colors");
-    selectColor.addEventListener("change", function (event) {
-        event.preventDefault();
-        newProduct.productColor = selectColor.value;
-    })
-}
-
-function addEventToQuantity(newProduct) {
-    //Recover the DOM elements that contain the quantity of the product
-    const quantityInput = document.getElementById("quantity");
-    quantityInput.addEventListener("change", function (event) {
-        event.preventDefault();
-        newProduct.productQuantity = parseInt(quantityInput.value);
-    })
-}
-
-function addEventToAddToCart(newProduct) {
-    //Recover the DOM element containing the "addToCart" button
-    const addToCart = document.getElementById("addToCart");
-    addToCart.addEventListener("click", function (event) {
-        event.preventDefault();
-        if (checkColorAndQuantityInputs(newProduct.productColor, newProduct.productQuantity) == true) {
-            addProductToCart(newProduct);
-        };
-    })
-}
-
 //Check the color and quantity inputs and display an alert if needed
-function checkColorAndQuantityInputs(productColor, productQuantity) {
+let checkColorAndQuantityInputs = (productColor, productQuantity) => {
     //If the selected quantity is between 1 and 100 units
     if (productQuantity > 0 && productQuantity <= 100 && productColor) {
         return true;
@@ -121,8 +112,8 @@ function checkColorAndQuantityInputs(productColor, productQuantity) {
 }
 
 //Add the product to cart 
-function addProductToCart(newProduct) {
-    let cart = []; 
+let addProductToCart = (newProduct) => {
+    let cart = [];
     // If a cart already exists in the local storage
     if (localStorage.getItem("cart")) {
         cart = JSON.parse(localStorage.getItem("cart"));
@@ -133,18 +124,18 @@ function addProductToCart(newProduct) {
             incrementProductQuantity(cart, foundProduct, newProduct.productQuantity);
             return;
         }
-    }    
+    }
     addNewProduct(cart, newProduct);
 }
 //Check if there selected product is already in the cart (same ID + same color)
-function findCartProduct(cart, product) {
+let findCartProduct = (cart, product) => {
     return cart.find(
         (p) => p.productId == product.productId && p.productColor == product.productColor
     )
 }
 
 //If there selected product is already in the cart, modify quantity
-function incrementProductQuantity(cart, foundProduct, productQuantity) {
+let incrementProductQuantity = (cart, foundProduct, productQuantity) => {
     //If the selected product is already in the cart, increment the quantity
     foundProduct.productQuantity += productQuantity;
     if (foundProduct.productQuantity > 100) {
@@ -157,14 +148,14 @@ function incrementProductQuantity(cart, foundProduct, productQuantity) {
 }
 
 // If the selected product is not in the cart, add a new product and confirm
-function addNewProduct(cart, newProduct) { 
+let addNewProduct = (cart, newProduct) => {
     cart.push(newProduct);
     localStorage.setItem("cart", JSON.stringify(cart));
     addedProductToCartConfirmation();
 }
 
 //Added products to cart confirmation
-function addedProductToCartConfirmation() {
+let addedProductToCartConfirmation = () => {
     if (window.confirm(`Le produit a été ajoutée au panier. Pour consulter votre panier, cliquez sur OK`)) {
         window.location.href = "cart.html";
     }
