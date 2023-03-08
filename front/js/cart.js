@@ -1,33 +1,28 @@
 //Retrieve the cart via the local storage and display the cart content//
+class Product {
 
-//Get cart from local storage
-let getCartFromLocalStorage = () => {
-    let cart = [];
-    if (localStorage.getItem("cart")) {
-        cart = JSON.parse(localStorage.getItem("cart"));
-        console.log(cart);
-    }
-    return cart
-}
-
-let displayCartContent = () => {
-
-    let cart = getCartFromLocalStorage();
-
-    if (cart == undefined || cart.length == 0) {
-        alert(`Votre panier est vide`);
+    constructor(data) {
+        this.id = data._id;
+        this.image = data.imageUrl;
+        this.altTxt = data.altTxt;
+        this.title = data.name;
+        this.description = data.description;
+        this.price = data.price;
+        this.color = undefined;
+        this.quantity = undefined;
     }
 
-    //Browse the cart content to display the product details
-    for (let product of cart) {
+    //Insert the product details into the product page
+    displayCartContent() {
+
         //Recover the DOM element that will host the cart products 
         const sectionCartItems = document.getElementById("cart__items");
 
         //Create an "article" tag for the product and set its attributes
         const cartItem = document.createElement("article");
         cartItem.className = "cart__item";
-        cartItem.setAttribute('data-id', product.productId);
-        cartItem.setAttribute('data-color', product.productColor);
+        cartItem.setAttribute('data-id', this.id);
+        cartItem.setAttribute('data-color', this.color);
         //Attach the product to the cart products section
         sectionCartItems.appendChild(cartItem);
 
@@ -39,8 +34,8 @@ let displayCartContent = () => {
 
         //Create an "img" tag for the product image
         const itemImage = document.createElement("img");
-        itemImage.src = product.productImage;
-        itemImage.alt = product.productAltTxt;
+        itemImage.src = this.image;
+        itemImage.alt = this.altTxt;
         //Attach the product image to the product
         cartItemImage.appendChild(itemImage);
 
@@ -58,34 +53,19 @@ let displayCartContent = () => {
 
         //Create an "h2" tag for the product title
         const productTitle = document.createElement("h2");
-        productTitle.textContent = product.productName;
+        productTitle.textContent = this.title;
         //Attach the title to the product 
         cartItemContentDescription.appendChild(productTitle);
 
         //Create a "p" tag for the product color
         const productColor = document.createElement("p");
-        productColor.textContent = product.productColor;
+        productColor.textContent = this.color;
         //Attach the color to the product
         cartItemContentDescription.appendChild(productColor);
 
         //Create a "p" tag for the product price   
         const productPrice = document.createElement("p");
-        productPrice.className = "itemPrice";
-
-        const urlPrice = 'http://localhost:3000/api/products/' + product.productId;
-        fetch(urlPrice)
-            //Check the URL and retrieve the response in the json format
-            .then((response) => response.json())
-            .then((product) => {
-                let price = product.price;
-                productPrice.textContent = price + " €";
-                
-            })
-            //Block of code to handle errors
-            .catch((error) => {
-                alert(`Une erreur s'est produite. Veuillez réessayer`);
-            })       
-
+        productPrice.textContent = this.price + " €";
         //Attach the "p" to the product 
         cartItemContentDescription.appendChild(productPrice);
 
@@ -114,11 +94,14 @@ let displayCartContent = () => {
         quantityInput.setAttribute("name", "itemQuantity");
         quantityInput.setAttribute("min", "1");
         quantityInput.setAttribute("max", "100");
-        quantityInput.value = product.productQuantity;
+        quantityInput.value = this.quantity;
         //Listen to the changes on the quantity inputs and retrieve the values 
         quantityInput.addEventListener("change", (event) => {
             event.preventDefault();
-            modifyProductQuantity(cart, product, quantityInput);
+            if (localStorage.getItem("cart")) {
+                let cart = JSON.parse(localStorage.getItem("cart"));
+                this.modifyQuantity(quantityInput, cart);
+            }
         });
         //Attach the quantity details to the product
         cartItemContentSettingsQuantity.appendChild(quantityInput);
@@ -136,7 +119,10 @@ let displayCartContent = () => {
         //Listen to the click on the "deleteItem" button and delete the products
         deleteItem.addEventListener("click", (event) => {
             event.preventDefault();
-            deleteItemFromCart(cart, product);
+            if (localStorage.getItem("cart")) {
+                let cart = JSON.parse(localStorage.getItem("cart"));
+                this.deleteFromCart(cart);
+            }
         });
         //Attach the delete option to the product
         cartItemContentSettingsDelete.appendChild(deleteItem);
@@ -144,73 +130,91 @@ let displayCartContent = () => {
         //Recover the DOM element that contain the total quantity
         const totalQuantityInput = document.getElementById("totalQuantity");
         //Insert the total quantity to the section
-        totalQuantityInput.textContent = totalQuantity();
+        totalQuantityInput.textContent = this.totalQuantity();
 
         //Recover the DOM element that contain the total price       
         const totalPriceInput = document.getElementById("totalPrice");
         //Insert the total price to the section
-        totalPriceInput.textContent = totalPrice();
+        totalPriceInput.textContent = this.totalPrice();
     }
-}
-displayCartContent();
 
-function totalQuantity() {
-    let totalQuantity = 0;
-    if (localStorage.getItem("cart")) {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        for (let product of cart) {
-            totalQuantity += product.productQuantity;
+    totalQuantity() {
+        let totalQuantity = 0;
+        if (localStorage.getItem("cart")) {
+            let cart = JSON.parse(localStorage.getItem("cart"));
+            for (let item of cart) {
+                totalQuantity += item.quantity;
+            }
         }
+        return totalQuantity;
     }
-    return totalQuantity;
-}
 
-/*function getP() {
-    let productPrice = document.getElementsByClassName("itemPrice");
-    console.log(productPrice);
-    let price = 0;
-    for (let i = 0; i < productPrice.length; i++) {
-        price = productPrice[i].textContent;
-        console.log(price);
-        return price;
-    }
-}*/
-
-function totalPrice(price) {
-    let totalPrice = 0;
-    if (localStorage.getItem("cart")) {
-        let cart = JSON.parse(localStorage.getItem("cart"));
-        for (let product of cart) {
-            totalPrice += product.productQuantity * parseInt(price);
+    totalPrice() {
+        let totalPrice = 0;
+        if (localStorage.getItem("cart")) {
+            let cart = JSON.parse(localStorage.getItem("cart"));
+            for (let item of cart) {
+                totalPrice += item.quantity * parseInt(this.price);
+            }
         }
+        return totalPrice;
     }
-    return totalPrice;
-}
 
-let modifyProductQuantity = (cart, product, quantityInput) => {
-    //If the new quantity is bigger than 100 units, alert and reset to the initial quantity     
-    if (parseInt(quantityInput.value) > 100) {
-        alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
-    }
-    else {
-        product.productQuantity = parseInt(quantityInput.value);
-        localStorage.setItem("cart", JSON.stringify(cart));
-        alert(`La quantité du produit a été modifié`);
-    }
-    window.location.reload();
-}
-
-let deleteItemFromCart = (cart, product) => {
-    if (window.confirm(`Le produit va être supprimé du panier. Cliquez sur OK pour confirmer`)) {
-        //Look for the selected product (same ID + same color) and keep everything different from it 
-        cart = cart.filter(
-            (p) => p.productId !== product.productId || p.productColor !== product.productColor
-        );
-        localStorage.setItem("cart", JSON.stringify(cart));
-        alert("Le produit a été supprimer")
+    modifyQuantity(quantityInput, cart) {
+        //If the new quantity is bigger than 100 units, alert and reset to the initial quantity     
+        if (parseInt(quantityInput.value) > 100) {
+            alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
+        }
+        else {
+            this.quantity = parseInt(quantityInput.value);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            alert(`La quantité du produit a été modifié`);
+        }
         window.location.reload();
     }
-    else {
-        alert("Le produit n'a pas été supprimé")
+
+    deleteFromCart(cart) {
+        if (window.confirm(`Le produit va être supprimé du panier. Cliquez sur OK pour confirmer`)) {
+            //Look for the selected product (same ID + same color) and keep everything different from it 
+            cart = cart.filter(
+                (p) => p.id !== this.id || p.color !== this.color
+            );
+            localStorage.setItem("cart", JSON.stringify(cart));
+            alert("Le produit a été supprimer")
+            window.location.reload();
+        }
+        else {
+            alert("Le produit n'a pas été supprimé")
+        }
     }
 }
+
+//Get cart from local storage
+let getCartFromLocalStorage = () => {
+    if (localStorage.getItem("cart")) {
+        let cart = JSON.parse(localStorage.getItem("cart"));
+        //Browse the cart content to display the product details
+        for (let item of cart) {
+            //Request the API to get the products to display//
+            const urlPrice = 'http://localhost:3000/api/products/' + item.id;
+            fetch(urlPrice)
+                //Check the URL and retrieve the response in the json format
+                .then((response) => response.json())
+                //Browse the response data to insert each product in the homepage
+                .then((data) => {
+                    let sofa = new Product(data);
+                    sofa.color = item.color;
+                    sofa.quantity = item.quantity;
+                    sofa.displayCartContent();
+                })
+            /*//Block of code to handle errors
+            .catch((error) => {
+                alert(`Une erreur s'est produite. Veuillez réessayer`);
+            })*/
+        }
+    }
+    else if (cart == undefined || cart.length == 0) {
+        alert(`Votre panier est vide`);
+    }
+}
+getCartFromLocalStorage();
