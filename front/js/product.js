@@ -1,19 +1,19 @@
-//Insert the products into the product page//
+//Create a class => "Product" to work with//
 class Product {
-
-    constructor(data) {
-        this.id = data._id;
-        this.image = data.imageUrl;
-        this.altTxt = data.altTxt;
-        this.title = data.name;
-        this.description = data.description;        
-        this.color = undefined;
+//Define the product details (at this point, it will be filled directly using the API data)
+    constructor(id, image, altTxt, title, description, color, undefined) {
+        this.id = id;
+        this.image = image;
+        this.altTxt = altTxt;
+        this.title = title;  
+        this.description = description;     
+        this.color = color;
         this.quantity = undefined;
     }
 
-    //Set the color options of the product
-    setColorOptions(data) {
-        for (let color of data.colors) {
+    //Set the color options of the product (using the API data)
+    setColorOptions() {
+        for (let color of this.color) {
             //Recover the DOM element that will host the "option" tag 
             const selectColor = document.getElementById("colors");
             //Create an "option" tag for the color option
@@ -24,7 +24,7 @@ class Product {
             selectColor.appendChild(colorOptions);
         }
     }
-
+//Set the price of the product (using the API data) 
     setPrice(data) {
         //Recover the DOM element that will host the product price and set the content
         const sectionItemPrice = document.getElementById("price");       
@@ -51,7 +51,7 @@ class Product {
         const sectionItemDescription = document.getElementById("description");
         sectionItemDescription.textContent = this.description;
 
-        //Recover the DOM elements that contain the color of the product
+        //Recover the DOM elements that contains the color of the product
         const selectColor = document.getElementById("colors");
         //Listen to the changes on the color inputs and retrieve the values
         selectColor.addEventListener("change", (event) => {
@@ -59,7 +59,7 @@ class Product {
             this.color = selectColor.value;
         })
 
-        //Recover the DOM elements that contain the quantity of the product
+        //Recover the DOM elements that contains the quantity of the product
         const quantityInput = document.getElementById("quantity");
         //Listen to the changes on the quantity inputs and retrieve the values
         quantityInput.addEventListener("change", (event) => {
@@ -67,9 +67,9 @@ class Product {
             this.quantity = parseInt(quantityInput.value);
         })
 
-        //Recover the DOM element containing the "addToCart" button
+        //Recover the DOM element that contains the "addToCart" button
         const addToCart = document.getElementById("addToCart");
-        //Listen to the click on the "addToCart" button and check the product details inputs 
+        //Listen to the click on the "addToCart" button to check the inputs and add to the cart  
         addToCart.addEventListener("click", (event) => {
             event.preventDefault();
             if (this.validateColorAndQuantityInputs() == true) {
@@ -98,6 +98,7 @@ class Product {
 
     //Add the product to cart 
     addToCart() {
+        //CReate a cart (an empty array)
         let cart = [];
         // If a cart already exists in the local storage, retrieve the cart
         if (localStorage.getItem("cart")) {
@@ -109,6 +110,7 @@ class Product {
             //If the selected product is already in the cart, increment the quantity
             if (foundProduct !== undefined) {
                 foundProduct.quantity += this.quantity;
+                //If the selected quantity exceeds 100 units
                 if (foundProduct.quantity > 100) {
                     alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
                 }
@@ -121,7 +123,7 @@ class Product {
                 return;
             }
         }
-        // If the ls is empty and/or the selected product is not in the cart, add a new product
+        // If the local storage is empty and/or the selected product is not in the cart, add a new product
         cart.push(this);
         localStorage.setItem("cart", JSON.stringify(cart));
         if (window.confirm(`Le produit a été ajoutée au panier. Pour consulter votre panier, cliquez sur OK`)) {
@@ -130,22 +132,28 @@ class Product {
     }
 }
 
+//Insert the products into the product page//
+
 //Get the Id of the selected product
 let getId = () => {
     return new URL(window.location.href).searchParams.get("id");
 };
 
-//Request the API to get the products to display//
+//Request the API to get the product to display
 const urlId = 'http://localhost:3000/api/products/' + getId();
 fetch(urlId)
     //Check the URL and retrieve the response in the json format
     .then((response) => response.json())
-    //Browse the response data to insert each product in the homepage
+    //Browse the response data to insert the product in the product page
     .then((data) => {
-        let sofa = new Product(data);
-        sofa.setColorOptions(data);
-        sofa.setPrice(data);
-        sofa.displayDetails();
+        //Create an object => "kanap" and set the details with the API data
+        let kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description, data.colors, undefined);
+        //Set the color options 
+        kanap.setColorOptions();
+        //Set the price (directly from the API in order to keep it out of the local storage)
+        kanap.setPrice(data);
+         //Display the object and its details 
+        kanap.displayDetails();
     })
     //Block of code to handle errors
     .catch((error) => {

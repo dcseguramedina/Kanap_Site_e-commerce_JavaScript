@@ -103,11 +103,11 @@ let infoValidation = (firstName, lastName, address, city, email) => {
 
 let createOrder = (firstName, lastName, address, city, email) => {
     //Create a table of products to recover the productId of each product added to the cart
-    let items = [];
+    let products = [];
     if (localStorage.getItem("cart")) {
         let cart = JSON.parse(localStorage.getItem("cart"));
-        for (let item of cart)
-            items.push(item.id);
+        for (let product of cart)
+            products.push(product.id);
     }
 
     // Create a contact object (from the form data)
@@ -121,7 +121,7 @@ let createOrder = (firstName, lastName, address, city, email) => {
 
     //Create an order object containing the list of products IDs and the contact information//
     let order = {
-        items: items,
+        products: products,
         contact: contact
     }
     console.log(order);
@@ -148,9 +148,9 @@ let sendOrderToServer = (order) => {
             console.log(order);
             let orderId = order.orderId;
             if (orderId != undefined) {
-                //location.href = 'confirmation.html?id=' + orderId;
+                location.href = 'confirmation.html?id=' + orderId;
             }
-            //localStorage.clear();
+            localStorage.clear();
         })
         //Block of code to handle errors
         .catch((error) => {

@@ -13,7 +13,7 @@ class Product {
     }
 
     //Insert the product details into the product page
-    displayCartContent() {
+    displayCartContent(cart) {
 
         //Recover the DOM element that will host the cart products 
         const sectionCartItems = document.getElementById("cart__items");
@@ -98,10 +98,11 @@ class Product {
         //Listen to the changes on the quantity inputs and retrieve the values 
         quantityInput.addEventListener("change", (event) => {
             event.preventDefault();
-            if (localStorage.getItem("cart")) {
+            this.modifyQuantity(cart, parseInt(quantityInput.value));
+            /*if (localStorage.getItem("cart")) {
                 let cart = JSON.parse(localStorage.getItem("cart"));
                 this.modifyQuantity(quantityInput, cart);
-            }
+            }*/
         });
         //Attach the quantity details to the product
         cartItemContentSettingsQuantity.appendChild(quantityInput);
@@ -130,43 +131,35 @@ class Product {
         //Recover the DOM element that contain the total quantity
         const totalQuantityInput = document.getElementById("totalQuantity");
         //Insert the total quantity to the section
-        totalQuantityInput.textContent = this.totalQuantity();
+        totalQuantityInput.textContent = this.totalQuantity(parseInt(totalQuantityInput.textContent));
 
         //Recover the DOM element that contain the total price       
         const totalPriceInput = document.getElementById("totalPrice");
-        //Insert the total price to the section
-        totalPriceInput.textContent = this.totalPrice();
+        //Insert the total price to the section        
+        totalPriceInput.textContent = this.totalPrice(parseInt(totalPriceInput.textContent));
     }
 
-    totalQuantity() {
-        let totalQuantity = 0;
-        if (localStorage.getItem("cart")) {
-            let cart = JSON.parse(localStorage.getItem("cart"));
-            for (let item of cart) {
-                totalQuantity += item.quantity;
-            }
-        }
-        return totalQuantity;
+    totalQuantity(totalQuantityInput) {
+        if (!totalQuantityInput) {
+            totalQuantityInput=0
+        } 
+        return totalQuantityInput += this.quantity;
     }
 
-    totalPrice() {
-        let totalPrice = 0;
-        if (localStorage.getItem("cart")) {
-            let cart = JSON.parse(localStorage.getItem("cart"));
-            for (let item of cart) {
-                totalPrice += item.quantity * parseInt(this.price);
-            }
-        }
-        return totalPrice;
+    totalPrice(totalPriceInput) {
+        if (!totalPriceInput) {
+            totalPriceInput=0
+        }       
+        return totalPriceInput + (this.quantity * this.price);
     }
 
-    modifyQuantity(quantityInput, cart) {
+    modifyQuantity(cart, quantityInput) {
         //If the new quantity is bigger than 100 units, alert and reset to the initial quantity     
-        if (parseInt(quantityInput.value) > 100) {
+        if (quantityInput > 100) {
             alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
         }
         else {
-            this.quantity = parseInt(quantityInput.value);
+            this.quantity += quantityInput;
             localStorage.setItem("cart", JSON.stringify(cart));
             alert(`La quantité du produit a été modifié`);
         }
@@ -205,13 +198,13 @@ let getCartFromLocalStorage = () => {
                     let sofa = new Product(data);
                     sofa.color = item.color;
                     sofa.quantity = item.quantity;
-                    sofa.displayCartContent();
+                    sofa.displayCartContent(cart);
                 })
-            /*//Block of code to handle errors
+            //Block of code to handle errors
             .catch((error) => {
                 alert(`Une erreur s'est produite. Veuillez réessayer`);
-            })*/
-        }
+            })            
+        }        
     }
     else if (cart == undefined || cart.length == 0) {
         alert(`Votre panier est vide`);
