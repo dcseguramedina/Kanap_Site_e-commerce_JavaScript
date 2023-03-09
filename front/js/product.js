@@ -1,6 +1,6 @@
 //Create a class => "Product" to work with//
 class Product {
-//Define the product details (at this point, it will be filled directly using the API data)
+//Define the product details
     constructor(id, image, altTxt, title, description, color, undefined) {
         this.id = id;
         this.image = image;
@@ -11,7 +11,7 @@ class Product {
         this.quantity = undefined;
     }
 
-    //Set the color options of the product (using the API data)
+    //Set the color options of the product
     setColorOptions() {
         for (let color of this.color) {
             //Recover the DOM element that will host the "option" tag 
@@ -152,7 +152,7 @@ fetch(urlId)
         kanap.setColorOptions();
         //Set the price (directly from the API in order to keep it out of the local storage)
         kanap.setPrice(data);
-         //Display the object and its details 
+        //Display the object and its details 
         kanap.displayDetails();
     })
     //Block of code to handle errors

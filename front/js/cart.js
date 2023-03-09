@@ -1,18 +1,16 @@
-//Retrieve the cart via the local storage and display the cart content//
+//Create a class => "Product" to work with//
 class Product {
-
-    constructor(data) {
-        this.id = data._id;
-        this.image = data.imageUrl;
-        this.altTxt = data.altTxt;
-        this.title = data.name;
-        this.description = data.description;
-        this.price = data.price;
-        this.color = undefined;
-        this.quantity = undefined;
+    //Define the product details
+    constructor(id, image, altTxt, title, description, price) {
+        this.id = id;
+        this.image = image;
+        this.altTxt = altTxt;
+        this.title = title;
+        this.description = description;
+        this.price = price;
     }
 
-    //Insert the product details into the product page
+    //Insert the cart content into the cart page
     displayCartContent(cart) {
 
         //Recover the DOM element that will host the cart products 
@@ -182,6 +180,8 @@ class Product {
     }
 }
 
+//Retrieve the cart via the local storage and display the cart content//
+
 //Get cart from local storage
 let getCartFromLocalStorage = () => {
     if (localStorage.getItem("cart")) {
@@ -195,10 +195,14 @@ let getCartFromLocalStorage = () => {
                 .then((response) => response.json())
                 //Browse the response data to insert each product in the homepage
                 .then((data) => {
-                    let sofa = new Product(data);
-                    sofa.color = item.color;
-                    sofa.quantity = item.quantity;
-                    sofa.displayCartContent(cart);
+                    //Create an object => "kanap" and set the details with the API data
+                    let kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description, data.price);
+                    console.log(kanap);
+                    //Set the color and quantity (directly from the cart data)
+                    kanap.color = item.color;
+                    kanap.quantity = item.quantity;
+                    //Display the object and its details 
+                    kanap.displayCartContent(cart);
                 })
             //Block of code to handle errors
             .catch((error) => {
