@@ -157,7 +157,7 @@ class Product {
             alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
         }
         else {
-            this.quantity += quantityInput;
+            this.quantity = quantityInput;
             localStorage.setItem("cart", JSON.stringify(cart));
             alert(`La quantité du produit a été modifié`);
         }

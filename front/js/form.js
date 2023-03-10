@@ -94,7 +94,7 @@ let infoValidation = (firstName, lastName, address, city, email) => {
         city.regex.test(city.docName.value) !== true ||
         email.regex.test(email.docName.value) !== true
     ) {
-        alert(`Le formulaire est incorrect`);
+        alert(`Le formulaire est incorrect. Veuillez remplir tout les champs`);
         // If the verification goes well, send the POST request 
     } else {
         createOrder(firstName, lastName, address, city, email);
