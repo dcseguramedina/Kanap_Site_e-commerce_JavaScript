@@ -1,50 +1,6 @@
-//Create a class => "Product" to work with//
-class Product {
-    //Define the product details
-    constructor(id, image, altTxt, title, description) {
-        this.id = id;
-        this.image = image;
-        this.altTxt = altTxt;
-        this.title = title;
-        this.description = description;
-    }
-    //Display the set of product and its details 
-    displayDetails() {
-        //Recover the DOM element that will host the set of products 
-        const itemsSection = document.getElementById("items");
+import Product from "./modules/Product.js";
 
-        //Create an "a" tag to make the link to a product
-        const itemLink = document.createElement("a");
-        //Set the "a" tag and its "href" attribute
-        itemLink.href = `./product.html?id=${this.id}`;
-        //Attach the "a" tag to the items section
-        itemsSection.appendChild(itemLink);
-
-        //Create an "article" tag dedicated to a product
-        const itemArticle = document.createElement("article");
-        //Attach the "article" tag to the link section
-        itemLink.appendChild(itemArticle);
-
-        //Create an "img" tag for each product
-        const itemImage = document.createElement("img");
-        itemImage.src = this.image;
-        itemImage.alt = this.altTxt;
-        //Attach the "img" tag of each product to the article section
-        itemArticle.appendChild(itemImage);
-
-        //Create a "h3" tag for each product
-        const itemName = document.createElement("h3");
-        itemName.textContent = this.title;
-        //Attach the "h3" tag of each product to the article section
-        itemArticle.appendChild(itemName);
-
-        //Create a "p" tag for each product
-        const itemDescription = document.createElement("p");
-        itemDescription.textContent = this.description;
-        //Attach the "p" tag of each product to the article section
-        itemArticle.appendChild(itemDescription);
-    }
-}
+let kanap = new Product();
 
 //Insert the set of products of Kanap into the home page//
 
@@ -58,9 +14,10 @@ fetch(url)
     .then((datas) => {
         for (let data of datas) {
             //Create an object => "kanap" and set the details with the API data 
-            let kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description);
+            kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description);          
+            console.log(kanap);
             //Display the object and its details 
-            kanap.displayDetails();
+            kanap.displaySetDetails();
         }
     })
     //Block of code to handle errors
