@@ -49,7 +49,6 @@ export default class Product {
         //Attach the "p" tag of each product to the article section
         itemArticle.appendChild(itemDescription);
     }
-
     //Product page - Set the color options of the product
     setColorOptions() {
         for (let color of this.color) {
@@ -69,7 +68,6 @@ export default class Product {
         const sectionItemPrice = document.getElementById("price");
         sectionItemPrice.textContent = data.price;
     }
-
     //Product page - Display the product details
     displaySingleDetails() {
         //Recover the DOM element that will host the product image 
@@ -116,7 +114,6 @@ export default class Product {
             }
         })
     }
-
     //Product page - Check the color and quantity inputs and display an alert if needed
     validateColorAndQuantityInputs() {
         //If the selected quantity is between 1 and 100 units, validate
@@ -134,7 +131,6 @@ export default class Product {
             return false
         }
     }
-
     //Product page - Add the product to cart 
     addToCart() {
         //CReate a cart (an empty array)
@@ -169,10 +165,8 @@ export default class Product {
             window.location.href = "cart.html";
         }
     }
-
     //Cart page - Display the cart content
     displayCartContent(cart) {
-
         //Recover the DOM element that will host the cart products 
         const sectionCartItems = document.getElementById("cart__items");
 

@@ -6,7 +6,6 @@ let kanap = new Product();
 
 //Request the API to get the details of the set of product
 const url = 'http://localhost:3000/api/products/';
-
 fetch(url)
     //Check the URL and retrieve the response in the json format
     .then((response) => response.json())

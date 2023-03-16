@@ -8,7 +8,6 @@ let kanap = new Product();
 let getId = () => {
     return new URL(window.location.href).searchParams.get("id");
 };
-
 //Request the API to get the product to display
 const urlId = 'http://localhost:3000/api/products/' + getId();
 fetch(urlId)
