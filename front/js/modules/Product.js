@@ -310,7 +310,11 @@ export default class Product {
             alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
         }
         else {
-            this.quantity += quantityInput;
+            this.quantity = quantityInput;
+            let foundProduct = cart.find(
+                (p) => p.id == this.id && p.color == this.color
+            );
+            foundProduct.quantity = this.quantity;
             localStorage.setItem("cart", JSON.stringify(cart));
             alert(`La quantité du produit a été modifié`);
         }
