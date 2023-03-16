@@ -14,8 +14,7 @@ fetch(url)
     .then((datas) => {
         for (let data of datas) {
             //Create an object => "kanap" and set the details with the API data 
-            kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description);          
-            console.log(kanap);
+            kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description);
             //Display the object and its details 
             kanap.displaySetDetails();
         }

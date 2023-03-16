@@ -18,7 +18,6 @@ fetch(urlId)
     .then((data) => {
         //Create an object => "kanap" and set the details with the API data
         kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description, data.colors, undefined);
-        console.log(kanap);
         //Set the color options 
         kanap.setColorOptions();
         //Set the price (directly from the API in order to keep it out of the local storage)

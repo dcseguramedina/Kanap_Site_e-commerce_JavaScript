@@ -1,17 +1,19 @@
-//Create a class => "Product" to work with//
+//Create a class => "Product" and add all the methods that will allow us to work allong the pages//
 export default class Product {
-    //Define the product details
+    //Define the product details//
     constructor(id, image, altTxt, title, description, color, price, undefined) {
         this.id = id;
         this.image = image;
         this.altTxt = altTxt;
         this.title = title;
         this.description = description;
-        this.color = color; 
-        this.price = price;               
+        this.color = color;
+        this.price = price;
         this.quantity = undefined
     }
-    //Display the set of products 
+    //Define the methods for the product//
+
+    //Homepage - Display the set of products
     displaySetDetails() {
         //Recover the DOM element that will host the set of products 
         const itemsSection = document.getElementById("items");
@@ -48,7 +50,7 @@ export default class Product {
         itemArticle.appendChild(itemDescription);
     }
 
-    //Set the color options of the product
+    //Product page - Set the color options of the product
     setColorOptions() {
         for (let color of this.color) {
             //Recover the DOM element that will host the "option" tag 
@@ -61,14 +63,14 @@ export default class Product {
             selectColor.appendChild(colorOptions);
         }
     }
-    //Set the price of the product (using the API data) 
+    //Product page - Set the price of the product (using the API data) 
     setPrice(data) {
         //Recover the DOM element that will host the product price and set the content
-        const sectionItemPrice = document.getElementById("price");       
+        const sectionItemPrice = document.getElementById("price");
         sectionItemPrice.textContent = data.price;
     }
 
-    //Insert the product details into the product page
+    //Product page - Display the product details
     displaySingleDetails() {
         //Recover the DOM element that will host the product image 
         const sectionItemImage = document.getElementsByClassName("item__img")[0];
@@ -115,25 +117,25 @@ export default class Product {
         })
     }
 
-    //Check the color and quantity inputs and display an alert if needed
+    //Product page - Check the color and quantity inputs and display an alert if needed
     validateColorAndQuantityInputs() {
-        //If the selected quantity is between 1 and 100 units
+        //If the selected quantity is between 1 and 100 units, validate
         if (this.quantity > 0 && this.quantity <= 100 && this.color) {
             return true
         }
-        //If the selected quantity exceeds 100 units
+        //If the selected quantity exceeds 100 units, display an alert
         else if (this.color && this.quantity > 100) {
             alert(`La quantité maximale est de 100 unités`);
             return false
         }
-        //If the color and quantity have not been selected
+        //If the color and quantity have not been selected, display an alert
         else {
             alert(`Veuillez sélectionner une couleur et une quantité afin de continuer`);
             return false
         }
     }
 
-    //Add the product to cart 
+    //Product page - Add the product to cart 
     addToCart() {
         //CReate a cart (an empty array)
         let cart = [];
@@ -147,7 +149,7 @@ export default class Product {
             //If the selected product is already in the cart, increment the quantity
             if (foundProduct !== undefined) {
                 foundProduct.quantity += this.quantity;
-                //If the selected quantity exceeds 100 units
+                //If the selected quantity exceeds 100 units, display an alert 
                 if (foundProduct.quantity > 100) {
                     alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
                 }
@@ -168,7 +170,7 @@ export default class Product {
         }
     }
 
-    //Insert the cart content into the cart page
+    //Cart page - Display the cart content
     displayCartContent(cart) {
 
         //Recover the DOM element that will host the cart products 
@@ -254,11 +256,10 @@ export default class Product {
         //Listen to the changes on the quantity inputs and retrieve the values 
         quantityInput.addEventListener("change", (event) => {
             event.preventDefault();
-            this.modifyQuantity(cart, parseInt(quantityInput.value));
-            /*if (localStorage.getItem("cart")) {
+            if (localStorage.getItem("cart")) {
                 let cart = JSON.parse(localStorage.getItem("cart"));
-                this.modifyQuantity(quantityInput, cart);
-            }*/
+                this.modifyQuantity(cart, parseInt(quantityInput.value));
+            }
         });
         //Attach the quantity details to the product
         cartItemContentSettingsQuantity.appendChild(quantityInput);
@@ -294,34 +295,34 @@ export default class Product {
         //Insert the total price to the section        
         totalPriceInput.textContent = this.totalPrice(parseInt(totalPriceInput.textContent));
     }
-
+    //Cart page - Get the total quantity
     totalQuantity(totalQuantityInput) {
         if (!totalQuantityInput) {
-            totalQuantityInput=0
-        } 
+            totalQuantityInput = 0
+        }
         return totalQuantityInput += this.quantity;
     }
-
+    //Cart page - Get the total price
     totalPrice(totalPriceInput) {
         if (!totalPriceInput) {
-            totalPriceInput=0
-        }       
+            totalPriceInput = 0
+        }
         return totalPriceInput + (this.quantity * this.price);
     }
-
+    //Cart page - Modify the quantity of a product
     modifyQuantity(cart, quantityInput) {
         //If the new quantity is bigger than 100 units, alert and reset to the initial quantity     
         if (quantityInput > 100) {
             alert(`La quantité maximale ne peut pas dépasser les 100 unités`);
         }
         else {
-            this.quantity = quantityInput;
+            this.quantity += quantityInput;
             localStorage.setItem("cart", JSON.stringify(cart));
             alert(`La quantité du produit a été modifié`);
         }
         window.location.reload();
     }
-
+    //Cart page - Delete a product from the cart
     deleteFromCart(cart) {
         if (window.confirm(`Le produit va être supprimé du panier. Cliquez sur OK pour confirmer`)) {
             //Look for the selected product (same ID + same color) and keep everything different from it 

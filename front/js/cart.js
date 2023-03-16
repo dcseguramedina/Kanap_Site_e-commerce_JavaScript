@@ -18,8 +18,7 @@ let getCartFromLocalStorage = () => {
                 //Browse the response data to insert each product in the homepage
                 .then((data) => {
                     //Create an object => "kanap" and set the details with the cart and API data
-                    kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description, item.color, data.price, item.quantity);
-                    console.log(kanap);                    
+                    kanap = new Product(data._id, data.imageUrl, data.altTxt, data.name, data.description, item.color, data.price, item.quantity);                   
                     //Display the object and its details 
                     kanap.displayCartContent(cart);
                 })
